@@ -1,4 +1,4 @@
-@props(['title', 'badge' => null, 'description' => null, 'buttons' => null, 'search' => null, 'filters' => null, 'columns', 'actions' => null, 'rows', 'pagination' => null])
+@props(['title', 'badge' => null, 'description' => null, 'buttons' => null, 'search' => null, 'filters' => null, 'columns', 'rows', 'empty' => null, 'pagination' => null])
 
 <section class="container px-4 mx-auto">
     <div class="sm:flex sm:items-center sm:justify-between">
@@ -19,71 +19,53 @@
 
         @if ($buttons)
             <div class="flex items-center mt-4 gap-x-3">
-                @foreach ($buttons as $type => $data)
-                    @if ($type === 'primary')
-                        <a href="{{ $data['url'] }}"
-                            class="flex items-center justify-center w-1/2 px-5 py-2 text-sm tracking-wide text-white transition-colors duration-200 bg-blue-500 rounded-lg shrink-0 sm:w-auto gap-x-2 hover:bg-blue-600 dark:hover:bg-blue-500 dark:bg-blue-600">
-                            @if (isset($data['icon']))
-                            @endif
-
-                            <span>{{ $data['name'] }}</span>
-                        </a>
-                    @elseif ($type === 'secondary')
-                        <a href="{{ $data['url'] }}"
-                            class="flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg gap-x-2 sm:w-auto dark:hover:bg-gray-800 dark:bg-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:border-gray-700">
-                            @if (isset($data['icon']))
-                            @endif
-
-                            <span>{{ $data['name'] }}</span>
-                        </a>
-                    @endif
-                @endforeach
+                {{ $buttons }}
             </div>
         @endif
     </div>
 
-    <div class="mt-6 md:flex md:items-center md:justify-between">
-        @if ($filters)
-            <div
-                class="inline-flex bg-white border divide-x rounded-lg dark:bg-gray-900 rtl:flex-row-reverse dark:border-gray-700 dark:divide-gray-700">
-                @foreach ($filters as $name => $filter)
-                    @if ($filter['active'])
-                        <a href="{{ $filter['url'] }}"
-                            class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 bg-gray-100 sm:text-sm dark:bg-gray-800 dark:text-gray-300">
-                            {{ $name }}
-                        </a>
-                    @else
-                        <a href="{{ $filter['url'] }}"
-                            class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 sm:text-sm dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">
-                            {{ $name }}
-                        </a>
-                    @endif
-                @endforeach
-            </div>
-        @endif
+    @if ($filters || $search)
+        <div class="mt-6 md:flex md:items-center md:justify-between">
+            @if ($filters)
+                <div
+                    class="inline-flex bg-white border divide-x rounded-lg dark:bg-gray-900 rtl:flex-row-reverse dark:border-gray-700 dark:divide-gray-700">
+                    @foreach ($filters as $name => $filter)
+                        @if ($filter['active'])
+                            <a href="{{ $filter['url'] }}"
+                                class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 bg-gray-100 sm:text-sm dark:bg-gray-800 dark:text-gray-300">
+                                {{ $name }}
+                            </a>
+                        @else
+                            <a href="{{ $filter['url'] }}"
+                                class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 sm:text-sm dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">
+                                {{ $name }}
+                            </a>
+                        @endif
+                    @endforeach
+                </div>
+            @endif
 
-        @if ($search)
-            <div class="relative flex items-center mt-4 md:mt-0">
-                <button type=submit class="absolute" form="searchForm">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="w-5 h-5 mx-3 text-gray-400 dark:text-gray-600">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                    </svg>
-                </button>
+            @if ($search)
+                <div class="relative flex items-center mt-4 md:mt-0">
+                    <button type=submit class="absolute" form="searchForm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-5 h-5 mx-3 text-gray-400 dark:text-gray-600">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                    </button>
 
-                <form action="{{ $search['url'] }}" method="GET" id="searchForm">
-                    <input type="text" name="search" id="search" placeholder="{{ $search['placeholder'] }}"
-                        value="{{ $search['value'] }}"
-                        class="block w-full py-1.5 pr-5 text-gray-700 bg-white border border-gray-200 rounded-lg md:w-80 placeholder-gray-400/70 pl-11 rtl:pr-11 rtl:pl-5 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40">
-                </form>
-            </div>
-        @endif
-    </div>
+                    <form action="{{ $search['url'] }}" method="GET" id="searchForm">
+                        <input type="text" name="search" id="search" placeholder="{{ $search['placeholder'] }}"
+                            autocomplete="off" value="{{ $search['value'] }}"
+                            class="block w-full py-1.5 pr-5 text-gray-700 bg-white border border-gray-200 rounded-lg md:w-80 placeholder-gray-400/70 pl-11 rtl:pr-11 rtl:pl-5 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40">
+                    </form>
+                </div>
+            @endif
+        </div>
+    @endif
 
     @if ($rows)
-
-
         <div class="flex flex-col mt-6">
             <div class="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
                 <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
@@ -109,63 +91,57 @@
                                             {{ $column }}
                                         </th>
                                     @endforeach
-
-                                    @if ($actions)
-                                        <th scope="col"
-                                            class="px-4 py-4 text-sm font-normal capitalize text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                            Actions
-                                        </th>
-                                    @endif
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
 
                                 @foreach ($rows as $row)
                                     <tr>
-                                        @foreach ($row as $column)
-                                            <td class="px-4 py-4 text-sm font-medium whitespace-nowrap">
-                                                <div>
-                                                    <h2 class="font-medium text-gray-800 dark:text-white ">
-                                                        {{ $column }}
-                                                    </h2>
-                                                </div>
-                                            </td>
-                                        @endforeach
-
-                                        @if ($actions)
-                                            <td class="px-4 py-4 text-sm whitespace-nowrap">
-                                                <div x-data="{ isOpen: false }" class="relative inline-block">
-                                                    <!-- Dropdown toggle button -->
-                                                    <button type="button" @click="isOpen = !isOpen"
-                                                        class="px-1 py-1 text-gray-500 transition-colors duration-200 rounded-lg dark:text-gray-300 hover:bg-gray-100">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                            class="w-6 h-6">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
-                                                        </svg>
-                                                    </button>
-
-                                                    <!-- Dropdown menu -->
-                                                    <div x-show="isOpen" @click.away="isOpen = false"
-                                                        x-transition:enter="transition ease-out duration-100"
-                                                        x-transition:enter-start="opacity-0 scale-90"
-                                                        x-transition:enter-end="opacity-100 scale-100"
-                                                        x-transition:leave="transition ease-in duration-100"
-                                                        x-transition:leave-start="opacity-100 scale-100"
-                                                        x-transition:leave-end="opacity-0 scale-90"
-                                                        class="absolute right-0 z-20 w-48 py-2 mt-2 origin-top-right bg-white rounded-md shadow-xl dark:bg-gray-800">
-
-                                                        @foreach ($actions as $name => $action)
-                                                            <a href="{{ route($action['url']) }}"
-                                                                class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                                                                {{ $name }}
-                                                            </a>
-                                                        @endforeach
+                                        @foreach ($row as $column => $data)
+                                            @if ($column != 'actions')
+                                                <td class="px-4 py-4 text-sm font-medium whitespace-nowrap">
+                                                    <div>
+                                                        <h2
+                                                            class="font-medium text-gray-800 dark:text-white overflow-wrap">
+                                                            {{ $data }}
+                                                        </h2>
                                                     </div>
-                                                </div>
-                                            </td>
-                                        @endif
+                                                </td>
+                                            @else
+                                                <td class="px-4 py-4 text-sm whitespace-nowrap">
+                                                    <div x-data="{ isOpen: false }" class="relative inline-block">
+                                                        <!-- Dropdown toggle button -->
+                                                        <button type="button" @click="isOpen = !isOpen"
+                                                            class="px-1 py-1 text-gray-500 transition-colors duration-200 rounded-lg dark:text-gray-300 hover:bg-gray-100">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                viewBox="0 0 24 24" stroke-width="1.5"
+                                                                stroke="currentColor" class="w-6 h-6">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
+                                                            </svg>
+                                                        </button>
+
+                                                        <!-- Dropdown menu -->
+                                                        <div x-show="isOpen" @click.away="isOpen = false"
+                                                            x-transition:enter="transition ease-out duration-100"
+                                                            x-transition:enter-start="opacity-0 scale-90"
+                                                            x-transition:enter-end="opacity-100 scale-100"
+                                                            x-transition:leave="transition ease-in duration-100"
+                                                            x-transition:leave-start="opacity-100 scale-100"
+                                                            x-transition:leave-end="opacity-0 scale-90"
+                                                            class="absolute right-0 z-20 w-48 py-2 mt-2 origin-top-right bg-white rounded-md shadow-xl dark:bg-gray-800">
+
+                                                            @foreach ($data as $name => $action)
+                                                                <a href="{{ $action['url'] }}"
+                                                                    class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                                                                    {{ $name }}
+                                                                </a>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            @endif
+                                        @endforeach
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -174,8 +150,8 @@
                 </div>
             </div>
         </div>
-    @else
-        <x-empty-table :title="$title" :search="$search" />
+    @elseif ($empty)
+        {{ $empty }}
     @endif
 
     @if ($pagination)

@@ -23,6 +23,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/accounts', [AccountController::class, 'shows'])->name('accounts.shows');
     Route::get('/accounts/add', [AccountController::class, 'add'])->name('accounts.add');
     Route::post('/accounts/add', [AccountController::class, 'store'])->name('accounts.store');
+    Route::get('/accounts/{account}/{tab}', [AccountController::class, 'show'])->name('accounts.show');
+    Route::post('/accounts/{account}/edit', [AccountController::class, 'edit'])->name('accounts.edit');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
