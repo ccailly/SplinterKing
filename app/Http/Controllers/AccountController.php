@@ -44,7 +44,7 @@ class AccountController extends Controller
                     'url' => Account::find($row['id'])->qr_link(),
                 ],
                 'Supprimer' => [
-                    'url' => route('accounts.show', ['account' => $row['id'], 'tab' => 'Informations']),
+                    'url' => route('accounts.show', ['account' => $row['id'], 'tab' => 'Informations', 'delete' => true]),
                 ],
             ];
 
@@ -131,7 +131,15 @@ class AccountController extends Controller
         $account->has_kids = $request->input('hasKids', 0);
         $account->save();
 
-        return redirect()->route('accounts.show', ['account' => $id])->with('success', ['title' => 'Compte modifié', 'message' => 'Le compte a bien été modifié.']);
+        return redirect()->route('accounts.show', ['account' => $id, 'tab' => 'Informations'])->with('success', ['title' => 'Compte modifié', 'message' => 'Le compte a bien été modifié.']);
+    }
+
+    public function delete(Request $request, $id)
+    {
+        $account = Account::find($id);
+        $account->delete();
+
+        return redirect()->route('accounts.shows')->with('success', ['title' => 'Compte supprimé', 'message' => 'Le compte a bien été supprimé.']);
     }
 
     // Une roue est disponible si aucune roue n'a été tournée depuis 2 semaines et si nous sommes dans la dernière semaine du mois (Nombre de jours dans le mois - 7)
@@ -196,6 +204,7 @@ class AccountController extends Controller
         return view('accounts.show', [
             'tab' => $tab,
             'account' => $account,
+            'delete' => $request->query('delete', false) == '1',
             'wheels' => [
                 'available' => $wheels->where('catched_at', '>', Carbon::now()->subDays(14))->count() == 0 && Carbon::now()->day >= Carbon::now()->daysInMonth - 7,
                 'total' => $totalWheels,
