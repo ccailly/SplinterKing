@@ -14,12 +14,12 @@ return new class extends Migration
     public function up()
     {
         Schema::create('locks', function (Blueprint $table) {
-            $table->string('mail')->primary();
+            $table->unsignedBigInteger('account_id')->primary();
             $table->unsignedBigInteger('user_id');
             $table->timestamp('locked_at')->nullable()->useCurrent();
 
-            $table->foreign('mail')->references('mail')->on('accounts');
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('account_id')->references('id')->on('accounts')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->cascadeOnUpdate();
         });
     }
 

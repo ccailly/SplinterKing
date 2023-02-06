@@ -14,13 +14,13 @@ return new class extends Migration
     public function up()
     {
         Schema::create('coupons', function (Blueprint $table) {
-            $table->id();
+            $table->string('id')->primary();
             $table->unsignedBigInteger('snapshot_id');
             $table->string('label');
             $table->text('description');
             $table->date('ending_at');
 
-            $table->foreign('snapshot_id')->references('id')->on('snapshots');
+            $table->foreign('snapshot_id')->references('id')->on('snapshots')->cascadeOnUpdate()->cascadeOnDelete();
         });
     }
 

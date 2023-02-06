@@ -14,11 +14,14 @@ return new class extends Migration
     public function up()
     {
         Schema::create('snapshot_requests', function (Blueprint $table) {
-            $table->string('mail')->primary();
+            $table->unsignedBigInteger('account_id')->primary();
             $table->enum('priority', ['low', 'normal', 'high', 'urgent'])->default('normal');
+            $table->enum('status', ['pending', 'processing', 'completed', 'failed'])->default('pending');
+            $table->unsignedBigInteger('user_id');
             $table->timestamp('requested_at')->nullable()->useCurrent();
 
-            $table->foreign('mail')->references('mail')->on('accounts');
+            $table->foreign('account_id')->references('id')->on('accounts')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->cascadeOnUpdate();
         });
     }
 

@@ -13,15 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('wheels', function (Blueprint $table) {
-            $table->id()->autoIncrement();
-            $table->unsignedBigInteger('account_id');
-            $table->string('reward');
-            $table->unsignedBigInteger('user_id');
-            $table->timestamp('catched_at')->nullable()->useCurrent();
+        Schema::create('account_uses', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('account_id')->unsigned();
+            $table->bigInteger('user_id')->unsigned();
+            $table->timestamp('used_at')->nullable()->useCurrent();
 
             $table->foreign('account_id')->references('id')->on('accounts')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->cascadeOnUpdate();
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->cascadeOnDelete();
         });
     }
 
@@ -32,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('wheels');
+        Schema::dropIfExists('account_uses');
     }
 };

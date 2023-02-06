@@ -14,7 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::create('accounts', function (Blueprint $table) {
-            $table->string('mail')->primary();
+            $table->id()->autoIncrement();
+            $table->string('mail');
             $table->string('password');
             $table->string('qr_code');
             $table->string('qr_link')->nullable();
@@ -23,7 +24,7 @@ return new class extends Migration
             $table->boolean('has_kids')->default(false);
             $table->timestamp('created_at')->nullable()->useCurrent();
 
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->cascadeOnDelete();
         });
     }
 

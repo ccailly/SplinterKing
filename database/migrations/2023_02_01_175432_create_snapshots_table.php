@@ -14,14 +14,14 @@ return new class extends Migration
     public function up()
     {
         Schema::create('snapshots', function (Blueprint $table) {
-            $table->id();
-            $table->string('mail');
+            $table->id()->autoIncrement();
+            $table->unsignedBigInteger('account_id');
             $table->unsignedBigInteger('user_id');
             $table->integer('points');
-            $table->timestamp('capture_at')->nullable()->useCurrent();
+            $table->timestamp('captured_at')->nullable()->useCurrent();
 
-            $table->foreign('mail')->references('mail')->on('accounts');
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('account_id')->references('id')->on('accounts')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->cascadeOnUpdate();
         });
     }
 
