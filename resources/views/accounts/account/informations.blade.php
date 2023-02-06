@@ -71,10 +71,27 @@
     </div>
 
     <div class="flex justify-end gap-4 mt-6">
-        <a href="#"
-            class="px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-red-500 rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600">
-            Supprimer
-        </a>
+        <x-simple-modal open="{{ $delete }}" title="Suppression" desc="Êtes-vous sûr de vouloir supprimer le compte <strong>{{ $account->mail }}</strong> ?">
+            <x-slot name="icon">
+                <x-heroicon-o-trash class="w-8 h-8 text-gray-700" />
+            </x-slot>
+            <x-slot name="openBtn">
+                <button type="button"
+                    class="px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-red-500 rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600">
+                    Supprimer
+                </button>
+            </x-slot>
+            <x-slot name="buttons">
+                <button type="button" @click="isOpen = false"
+                    class="px-8 py-2.5 leading-5 text-gray-700 transition-colors duration-200 bg-white border rounded-lg sm:w-auto dark:hover:bg-gray-800 dark:bg-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:border-gray-700">
+                    Annuler
+                </button>
+                <a href="{{ route('accounts.delete', $account) }}"
+                    class="px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-red-500 rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600">
+                    Supprimer
+                </a>
+            </x-slot>
+        </x-simple-modal>
         <button
             class="px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600">Enregistrer</button>
     </div>
