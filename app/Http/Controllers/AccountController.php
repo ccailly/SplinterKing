@@ -71,7 +71,7 @@ class AccountController extends Controller
                 'value' => $search,
             ],
             'total' => $total,
-            'columns' => ['mail', 'password', 'qr_code', 'Couronnes', 'coupons'],
+            'columns' => ['mail', 'password', 'qr_code', 'Couronnes', 'coupons', 'actions'],
             'rows' => $rows,
             'pagination' => [
                 'total' => ceil($total / $account_per_page),

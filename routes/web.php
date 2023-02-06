@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\SnapshotsController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/{account}/edit', [AccountController::class, 'edit'])->name('accounts.edit');
         Route::get('/{account}/{tab}', [AccountController::class, 'show'])
             ->whereIn('tab', ['Informations', 'Roulette', 'Coupons', 'Snapshots', 'Historique'])->name('accounts.show');
+    });
+
+    Route::prefix('snapshots')->group(function () {
+        Route::get('/', [SnapshotsController::class, 'shows'])->name('snapshots.shows');
+
+        Route::prefix('requests')->group(function () {
+            Route::get('/add', [SnapshotsController::class, 'add'])->name('snapshots.requests.add');
+            Route::post('/add', [SnapshotsController::class, 'store'])->name('snapshots.requests.store');
+            Route::get('/{account}', [SnapshotsController::class, 'show'])->name('snapshots.requests.show');
+            Route::post('/{account}/edit', [SnapshotsController::class, 'edit'])->name('snapshots.requests.edit');
+            Route::get('/{account}/delete', [SnapshotsController::class, 'delete'])->name('snapshots.requests.delete');
+        });
     });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
