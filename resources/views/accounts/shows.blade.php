@@ -7,13 +7,13 @@
                         :rows="$rows" :pagination="$pagination">
                         <x-slot name="buttons">
                             <a href="{{ route('accounts.add') }}"
-                                class="flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg gap-x-2 sm:w-auto dark:hover:bg-gray-800 dark:bg-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:border-gray-700">
+                                class="flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg gap-x-2 sm:w-auto   hover:bg-gray-100  ">
                                 <x-heroicon-o-user-circle class="w-5 h-5" />
 
                                 <span>Tâches de création de compte</span>
                             </a>
                             <a href="{{ route('accounts.add') }}"
-                                class="flex items-center justify-center w-1/2 px-5 py-2 text-sm tracking-wide text-white transition-colors duration-200 bg-blue-500 rounded-lg shrink-0 sm:w-auto gap-x-2 hover:bg-blue-600 dark:hover:bg-blue-500 dark:bg-blue-600">
+                                class="flex items-center justify-center w-1/2 px-5 py-2 text-sm tracking-wide text-white transition-colors duration-200 bg-blue-500 rounded-lg shrink-0 sm:w-auto gap-x-2 hover:bg-blue-600  ">
                                 <x-heroicon-o-plus-circle class="w-5 h-5" />
 
                                 <span>Ajouter un compte</span>
@@ -27,7 +27,7 @@
                                 </x-slot>
                                 <x-slot name="buttons">
                                     <button onclick="document.getElementById('search').focus();"
-                                        class="w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg sm:w-auto dark:hover:bg-gray-800 dark:bg-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:border-gray-700">
+                                        class="w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg sm:w-auto   hover:bg-gray-100  ">
                                         Modifier la recherche
                                     </button>
                                 </x-slot>
