@@ -20,11 +20,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::redirect('/dashboard', '/');
 
-    Route::get('/accounts', [AccountController::class, 'shows'])->name('accounts.shows');
-    Route::get('/accounts/add', [AccountController::class, 'add'])->name('accounts.add');
-    Route::post('/accounts/add', [AccountController::class, 'store'])->name('accounts.store');
-    Route::get('/accounts/{account}/{tab}', [AccountController::class, 'show'])->name('accounts.show');
-    Route::post('/accounts/{account}/edit', [AccountController::class, 'edit'])->name('accounts.edit');
+    Route::prefix('accounts')->group(function () {
+        Route::get('/', [AccountController::class, 'shows'])->name('accounts.shows');
+        Route::get('/add', [AccountController::class, 'add'])->name('accounts.add');
+        Route::post('/add', [AccountController::class, 'store'])->name('accounts.store');
+        Route::get('/{account}/delete', [AccountController::class, 'delete'])->name('accounts.delete');
+        Route::post('/{account}/edit', [AccountController::class, 'edit'])->name('accounts.edit');
+        Route::get('/{account}/{tab}', [AccountController::class, 'show'])
+            ->whereIn('tab', ['Informations', 'Roulette', 'Coupons', 'Snapshots', 'Historique'])->name('accounts.show');
+    });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
