@@ -172,22 +172,25 @@ class AccountController extends Controller
         $totalCoupons = $coupons->get()->count();
         $rowsCoupons = $coupons->skip(($page - 1) * $rows_per_page)->take($rows_per_page)->get()->toArray();
 
-        $snapshots = Snapshot::where('account_id', $id)
-            ->join('coupons', 'coupons.snapshot_id', '=', 'snapshots.id')
-            ->select('points', DB::raw('COUNT(coupons.id) as nb_coupons'), 'user_id', 'captured_at')
-            ->groupBy('snapshots.id')
+        $snapshots = SnapshotRequest::leftjoin('snapshots', 'snapshots.snapshot_request_id', '=', 'snapshot_requests.id')
+            ->leftjoin('coupons', 'coupons.snapshot_id', '=', 'snapshots.id')
+            ->whereIn('snapshot_requests.status', ['completed', 'failed'])
+            ->select('snapshot_requests.status', DB::raw('IFNULL(points, 0)'), DB::raw('count(coupons.snapshot_id) as nb_coupons'), 'snapshot_requests.user_id', DB::raw('IFNULL(captured_at, requested_at) as captured_at'))
+            ->groupBy('snapshots.id', 'snapshots.points', 'snapshots.captured_at', 'snapshot_requests.account_id', 'snapshot_requests.user_id', 'snapshot_requests.status', 'snapshot_requests.requested_at')
             ->orderBy('captured_at', 'desc');
-        if ($tab == 'Snapshots') {
-            $snapshots->where('points', 'like', '%' . $search . '%')
-                ->orWhere('user_id', 'like', '%' . $search . '%')
-                ->orWhere('captured_at', 'like', '%' . $search . '%');
+
+        if ($tab == 'Snapshots' && $search != '') {
+            $snapshots->where('snapshots.points', 'like', '%' . $search . '%')
+                ->orWhere('snapshots.user_id', 'like', '%' . $search . '%')
+                ->orWhere('snapshots.captured_at', 'like', '%' . $search . '%');
         }
         $totalSnapshots = $snapshots->get()->count();
         $rowsSnapshots = $snapshots->skip(($page - 1) * $rows_per_page)->take($rows_per_page)->get()->toArray();
 
         $requestedSnapshots = SnapshotRequest::where('account_id', $id)
             ->select('priority', 'status', 'user_id', 'requested_at')
-            ->orderBy('requested_at', 'desc');
+            ->whereIn('status', ['pending', 'processing'])
+            ->orderByDesc('priority');
         $totalRequestedSnapshots = $requestedSnapshots->get()->count();
         $rowsRequestedSnapshots = $requestedSnapshots->get()->toArray();
 
@@ -252,7 +255,7 @@ class AccountController extends Controller
             ],
             'snapshots' => [
                 'total' => $totalSnapshots,
-                'columns' => ['points', 'nb coupons', 'utilisateur', 'date'],
+                'columns' => ['status', 'points', 'nb coupons', 'utilisateur', 'date'],
                 'rows' => $rowsSnapshots,
                 'search' => [
                     'url' => route('accounts.show', ['account' => $id, 'tab' => 'Snapshots']),

@@ -5,3 +5,12 @@
 [x-cloak] {
     display: none !important;
 }
+
+@font-face {
+    font-family: 'Flame Regular';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: local(''),
+         url(../fonts/Flame-Regular.woff) format('woff');
+}

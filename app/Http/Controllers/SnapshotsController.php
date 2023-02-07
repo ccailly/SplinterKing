@@ -16,6 +16,7 @@ class SnapshotsController extends Controller
         $snapshots_request_page = $request->query('snapshots_request_page', 1);
         $snapshots_request_per_page = 30.0;
         $snapshots_request = SnapshotRequest::select('account_id', 'priority', 'status', 'user_id', 'requested_at')
+            ->whereIn('status', ['pending', 'processing'])
             ->orderByDesc('priority');
         $total_snapshots_request = $snapshots_request->get()->count();
         $rows_snapshots_request = $snapshots_request->skip(($snapshots_request_page - 1) * $snapshots_request_per_page)
@@ -36,13 +37,17 @@ class SnapshotsController extends Controller
         $snapshots_sort = $request->query('sort', 'captured_at');
         $snapshots_search = $request->query('search', '');
         $snapshots_per_page = 30.0;
-        $snapshots = Snapshot::join('coupons', 'coupons.snapshot_id', '=', 'snapshots.id')
-            ->where('snapshots.account_id', 'like', '%' . $snapshots_search . '%')
+        $snapshots = SnapshotRequest::leftjoin('snapshots', 'snapshots.snapshot_request_id', '=', 'snapshot_requests.id')
+            ->leftjoin('coupons', 'coupons.snapshot_id', '=', 'snapshots.id')
+            ->whereIn('snapshot_requests.status', ['completed', 'failed'])
+            ->orWhere('snapshots.account_id', 'like', '%' . $snapshots_search . '%')
             ->orWhere('snapshots.user_id', 'like', '%' . $snapshots_search . '%')
             ->orWhere('snapshots.points', 'like', '%' . $snapshots_search . '%')
             ->orWhere('snapshots.captured_at', 'like', '%' . $snapshots_search . '%')
-            ->select('snapshots.account_id', 'snapshots.user_id', 'points', DB::raw('count(coupons.snapshot_id) as nb_coupons'), 'captured_at')
-            ->groupBy('snapshots.id')->orderByDesc($snapshots_sort);
+            ->select('snapshot_requests.account_id', 'snapshot_requests.user_id', 'snapshot_requests.status', DB::raw('IFNULL(points, 0)'), DB::raw('count(coupons.snapshot_id) as nb_coupons'), DB::raw('IFNULL(captured_at, requested_at) as captured_at'))
+            ->groupBy('snapshots.id', 'snapshot_requests.account_id', 'snapshot_requests.user_id', 'snapshot_requests.status', 'snapshot_requests.requested_at')
+            ->orderByDesc($snapshots_sort);
+            
         $total_snapshots = $snapshots->get()->count();
         $rows_snapshots = $snapshots->skip(($snapshots_page - 1) * $snapshots_per_page)
             ->take($snapshots_per_page)->get()->toArray();
@@ -77,6 +82,7 @@ class SnapshotsController extends Controller
                 'columns' => [
                     'Compte',
                     'Utilisateur',
+                    'Status',
                     'Points',
                     'Nombre de coupons',
                     'Date de capture'
@@ -122,7 +128,7 @@ class SnapshotsController extends Controller
         $accountId = $request->query('accountId', null);
         $accounts = Account::all();
         $priorities = ['low', 'normal', 'high', 'urgent'];
-        
+
         return view('snapshots.requests.add', ['accountId' => $accountId, 'accounts' => $accounts, 'priorities' => $priorities]);
     }
 
