@@ -176,7 +176,7 @@ class AccountController extends Controller
             ->leftjoin('coupons', 'coupons.snapshot_id', '=', 'snapshots.id')
             ->whereIn('snapshot_requests.status', ['completed', 'failed'])
             ->select('snapshot_requests.status', DB::raw('IFNULL(points, 0)'), DB::raw('count(coupons.snapshot_id) as nb_coupons'), 'snapshot_requests.user_id', DB::raw('IFNULL(captured_at, requested_at) as captured_at'))
-            ->groupBy('snapshots.id', 'snapshot_requests.account_id', 'snapshot_requests.user_id', 'snapshot_requests.status', 'snapshot_requests.requested_at')
+            ->groupBy('snapshots.id', 'snapshots.points', 'snapshot_requests.account_id', 'snapshot_requests.user_id', 'snapshot_requests.status', 'snapshot_requests.requested_at')
             ->orderBy('captured_at', 'desc');
 
         if ($tab == 'Snapshots' && $search != '') {
