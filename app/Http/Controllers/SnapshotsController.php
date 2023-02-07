@@ -47,6 +47,7 @@ class SnapshotsController extends Controller
             ->select('snapshot_requests.account_id', 'snapshot_requests.user_id', 'snapshot_requests.status', DB::raw('IFNULL(points, 0)'), DB::raw('count(coupons.snapshot_id) as nb_coupons'), DB::raw('IFNULL(captured_at, requested_at) as captured_at'))
             ->groupBy('snapshots.id', 'snapshot_requests.account_id', 'snapshot_requests.user_id', 'snapshot_requests.status', 'snapshot_requests.requested_at')
             ->orderByDesc($snapshots_sort);
+            
         $total_snapshots = $snapshots->get()->count();
         $rows_snapshots = $snapshots->skip(($snapshots_page - 1) * $snapshots_per_page)
             ->take($snapshots_per_page)->get()->toArray();
