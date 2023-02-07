@@ -14,8 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create('locks', function (Blueprint $table) {
-            $table->unsignedBigInteger('account_id')->primary();
-            $table->unsignedBigInteger('user_id');
+            $table->id()->autoIncrement();
+            $table->unsignedBigInteger('account_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->timestamp('locked_at')->nullable()->useCurrent();
 
             $table->foreign('account_id')->references('id')->on('accounts')->cascadeOnUpdate()->cascadeOnDelete();

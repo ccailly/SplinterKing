@@ -15,11 +15,13 @@ return new class extends Migration
     {
         Schema::create('snapshots', function (Blueprint $table) {
             $table->id()->autoIncrement();
+            $table->unsignedBigInteger('snapshot_request_id')->nullable();
             $table->unsignedBigInteger('account_id');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->integer('points');
             $table->timestamp('captured_at')->nullable()->useCurrent();
 
+            $table->foreign('snapshot_request_id')->references('id')->on('snapshot_requests')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreign('account_id')->references('id')->on('accounts')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->cascadeOnUpdate();
         });
