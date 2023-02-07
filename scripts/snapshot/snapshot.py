@@ -62,3 +62,17 @@ def main(mail, password):
 
 if __name__ == '__main__':
     main(sys.argv[1], sys.argv[2])
+
+    # print(json.dumps({
+    #             "time_elapsed": 10,
+    #             "mail": "08rlub0uswx@1secmail.org",
+    #             "birthdate": "12/03/1998",
+    #             "hasKids": True,
+    #             "points": 130,
+    #             "coupons": [{
+    #                 "id": "BPL9O8CS",
+    #                 "label": "1 Whopper offert pour votre anniversaire ",
+    #                 "description": "Offre valable un mois hors service de livraison. Retrouvez la liste des restaurants participants et les conditions g\u00e9n\u00e9rales d\u2019utilisation du programme de fid\u00e9lit\u00e9 Kingdom sur l'application Burger King France et sur burgerking.fr. Pour connaitre le d\u00e9tail des produits offerts dans le cadre du Programme de fid\u00e9lit\u00e9 Kingdom, consultez les conditions g\u00e9n\u00e9rales d\u2019utilisation disponibles sur l'application Burger King France et sur burgerking.fr",
+    #                 "ending_at": "09/02/2023"
+    #             }]
+    #         }))
