@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('account_id')->unsigned();
             $table->bigInteger('user_id')->unsigned();
+            $table->string('reward');
             $table->timestamp('used_at')->nullable()->useCurrent();
-
             $table->foreign('account_id')->references('id')->on('accounts')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->cascadeOnDelete();
         });

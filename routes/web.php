@@ -4,6 +4,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\SnapshotsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DropController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +21,11 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::redirect('/dashboard', '/');
+
+    Route::prefix('drop')->group(function () {
+        Route::get('/', [DropController::class, 'index'])->name('drop.index');
+    });
+
 
     Route::prefix('accounts')->group(function () {
         Route::get('/', [AccountController::class, 'shows'])->name('accounts.shows');
