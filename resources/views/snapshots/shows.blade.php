@@ -43,18 +43,32 @@
                             </a>
                         </x-slot>
                         <x-slot name="empty">
-                            <x-empty-table title="Aucune snapshot trouvée"
-                                desc="Vous avez recherché <strong>{{ $snapshots['search']['value'] }}</strong>, ce qui ne correspond a aucune snapshot. Veuillez réessayer en étant plus permissif.">
-                                <x-slot name="icon">
-                                    <x-heroicon-o-magnifying-glass class="w-6 h-6" />
-                                </x-slot>
-                                <x-slot name="buttons">
-                                    <button onclick="document.getElementById('search').focus();"
-                                        class="w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg sm:w-auto dark:hover:bg-gray-800 dark:bg-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:border-gray-700">
-                                        Modifier la recherche
-                                    </button>
-                                </x-slot>
-                            </x-empty-table>
+                            @if ($snapshots['search']['value'])
+                                <x-empty-table title="Aucune snapshot trouvée"
+                                    desc="Vous avez recherché <strong>{{ $snapshots['search']['value'] }}</strong>, ce qui ne correspond a aucune snapshot. Veuillez réessayer en étant plus permissif.">
+                                    <x-slot name="icon">
+                                        <x-heroicon-o-magnifying-glass class="w-6 h-6" />
+                                    </x-slot>
+                                    <x-slot name="buttons">
+                                        <button onclick="document.getElementById('search').focus();"
+                                            class="w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg sm:w-auto dark:hover:bg-gray-800 dark:bg-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:border-gray-700">
+                                            Modifier la recherche
+                                        </button>
+                                    </x-slot>
+                                </x-empty-table>
+                            @else
+                                <x-empty-table title="Aucune snapshot" desc="Aucune snapshot sur ce compte.">
+                                    <x-slot name="icon">
+                                        <x-heroicon-o-document-magnifying-glass class="w-6 h-6" />
+                                    </x-slot>
+                                    <x-slot name="buttons">
+                                        <a href="{{ route('snapshots.requests.add') }}"
+                                            class="w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg sm:w-auto dark:hover:bg-gray-800 dark:bg-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:border-gray-700">
+                                            Demander une snapshot
+                                        </a>
+                                    </x-slot>
+                                </x-empty-table>
+                            @endif
                         </x-slot>
                     </x-table>
                 </div>
