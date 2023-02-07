@@ -25,3 +25,10 @@ jobs:
         git add -f public/
         git commit -m "Build front-end assets"
         git push -f origin deploy
+    - name: Deploy to production
+      uses: appleboy/ssh-action@master
+      with:
+        host: cloud.fragmendev.tk
+        username: ubuntu
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: 'cd /var/www/SplinterKing && ./deploy_server.sh'
