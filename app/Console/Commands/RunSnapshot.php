@@ -63,7 +63,7 @@ class MakeSnapshot extends Command
 
         // Execute the python script and get the json result
         try {
-            $resultRaw = ShellCommand::execute('python ./scripts/snapshot/snapshot.py ' . $account->mail . ' ' . $account->password);
+            $resultRaw = ShellCommand::execute('python3.10 ./scripts/snapshot/snapshot.py ' . $account->mail . ' ' . $account->password);
             if (isset($resultRaw['error']))
                 throw new Exception($resultRaw['error']);
         } catch (Exception $e) {
