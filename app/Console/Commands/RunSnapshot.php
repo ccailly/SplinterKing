@@ -11,7 +11,7 @@ use Illuminate\Console\Command;
 use Carbon\Carbon;
 use Exception;
 
-class MakeSnapshot extends Command
+class RunSnapshot extends Command
 {
     /**
      * The name and signature of the console command.
