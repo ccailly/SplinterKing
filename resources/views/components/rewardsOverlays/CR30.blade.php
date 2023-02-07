@@ -121,10 +121,8 @@
     column-rule-color: rgb(255, 255, 255);
     height: 406.828px;
     inline-size: 1280px;
-    margin-block-end: 150px;
     max-inline-size: 1280px;
     max-width: 1280px;
-    padding-block-end: 45px;
     padding-block-start: 35px;
     perspective-origin: 640px 243.406px;
     text-align: center;
@@ -140,7 +138,6 @@
     border: 0px none rgb(255, 255, 255);
     border-radius: 12px;
     font: 18px / 20.7px "Flame Sans Regular", "Flame Sans";
-    margin: 0px 0px 150px;
     outline: rgb(255, 255, 255) none 0px;
     padding: 35px 0px 480px;
     -webkit-border-after: 0px none rgb(255, 255, 255);

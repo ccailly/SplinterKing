@@ -21,7 +21,7 @@
                                 </x-slot>
                                 <x-slot name="buttons">
                                     <a href="snapshots.requests.add"
-                                        class="w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg sm:w-auto dark:hover:bg-gray-800 dark:bg-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:border-gray-700">
+                                        class="w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg sm:w-auto hover:bg-gray-100 dark:border-gray-700">
                                         Demander une snapshot
                                     </a>
                                 </x-slot>
@@ -36,7 +36,7 @@
                         :filters="$snapshots['filters']" :columns="$snapshots['columns']" :rows="$snapshots['rows']" :pagination="$snapshots['pagination']">
                         <x-slot name="buttons">
                             <a href="{{ route('accounts.add') }}"
-                                class="flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg gap-x-2 sm:w-auto dark:hover:bg-gray-800 dark:bg-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:border-gray-700">
+                                class="flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg gap-x-2 sm:w-auto hover:bg-gray-100 dark:border-gray-700">
                                 <x-heroicon-o-user-circle class="w-5 h-5" />
 
                                 <span>Tâches de vérifications</span>
@@ -50,7 +50,7 @@
                                 </x-slot>
                                 <x-slot name="buttons">
                                     <button onclick="document.getElementById('search').focus();"
-                                        class="w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg sm:w-auto dark:hover:bg-gray-800 dark:bg-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:border-gray-700">
+                                        class="w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg sm:w-auto  hover:bg-gray-100 ">
                                         Modifier la recherche
                                     </button>
                                 </x-slot>
