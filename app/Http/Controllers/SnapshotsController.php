@@ -15,7 +15,7 @@ class SnapshotsController extends Controller
     {
         $snapshots_request_page = $request->query('snapshots_request_page', 1);
         $snapshots_request_per_page = 30.0;
-        $snapshots_request = SnapshotRequest::select('account_id', 'priority', 'status', 'user_id', 'requested_at')
+        $snapshots_request = SnapshotRequest::select('snapshot_requests.id', 'account_id', 'priority', 'status', 'user_id', 'requested_at')
             ->whereIn('status', ['pending', 'processing'])
             ->orderByDesc('priority');
         $total_snapshots_request = $snapshots_request->get()->count();
@@ -25,12 +25,14 @@ class SnapshotsController extends Controller
         foreach ($rows_snapshots_request as $key => $row) {
             $rows_snapshots_request[$key]['actions'] = [
                 'Modifier' => [
-                    'url' => route('snapshots.requests.show', ['account' => $row['account_id']]),
+                    'url' => route('snapshots.requests.show', ['snapshot_request_id' => $row['id']]),
                 ],
                 'Supprimer' => [
-                    'url' => route('snapshots.requests.show', ['account' => $row['account_id'], 'delete' => true]),
+                    'url' => route('snapshots.requests.show', ['snapshot_request_id' => $row['id'], 'delete' => true]),
                 ],
             ];
+
+            unset($rows_snapshots_request[$key]['id']);
         }
 
         $snapshots_page = $request->query('snapshots_page', 1);
@@ -155,32 +157,33 @@ class SnapshotsController extends Controller
         return redirect()->route('snapshots.shows')->with('success', ['title' => 'Succès', 'message' => 'La demande de snapshot a bien été créée.']);
     }
 
-    function edit(Request $request, $account_id)
+    function edit(Request $request, $snapshot_request_id)
     {
         $request->validate([
             'priority' => 'required|in:low,normal,high,urgent'
         ]);
 
-        $snapshot_request = SnapshotRequest::find($account_id);
+        $snapshot_request = SnapshotRequest::find($snapshot_request_id);
         $snapshot_request->priority = $request->input('priority');
         $snapshot_request->save();
 
         return redirect()->route('snapshots.shows')->with('success', ['title' => 'Succès', 'message' => 'La demande de snapshot a bien été modifiée.']);
     }
 
-    function delete($account_id)
+    function delete($snapshot_request_id)
     {
-        $snapshot_request = SnapshotRequest::where('account_id', $account_id)->first();
+        $snapshot_request = SnapshotRequest::find($snapshot_request_id);
         $snapshot_request->delete();
 
         return redirect()->route('snapshots.shows')->with('success', ['title' => 'Succès', 'message' => 'La demande de snapshot a bien été supprimée.']);
     }
 
-    function show(Request $request, $account_id)
+    function show(Request $request, $snapshot_request_id)
     {
-        $account = Account::find($account_id);
+        $snapshot_request = SnapshotRequest::find($snapshot_request_id);
+        $account = Account::find($snapshot_request->account_id);
         $priorities = ['low', 'normal', 'high', 'urgent'];
 
-        return view('snapshots.requests.show', ['delete' => $request->query('delete', false) == '1', 'account' => $account, 'priorities' => $priorities]);
+        return view('snapshots.requests.show', ['delete' => $request->query('delete', false) == '1', 'snapshot_request' => $snapshot_request, 'account' => $account, 'priorities' => $priorities]);
     }
 }

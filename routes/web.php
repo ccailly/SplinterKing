@@ -44,9 +44,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::prefix('requests')->group(function () {
             Route::get('/add', [SnapshotsController::class, 'add'])->name('snapshots.requests.add');
             Route::post('/add', [SnapshotsController::class, 'store'])->name('snapshots.requests.store');
-            Route::get('/{account}', [SnapshotsController::class, 'show'])->name('snapshots.requests.show');
-            Route::post('/{account}/edit', [SnapshotsController::class, 'edit'])->name('snapshots.requests.edit');
-            Route::get('/{account}/delete', [SnapshotsController::class, 'delete'])->name('snapshots.requests.delete');
+            Route::get('/{snapshot_request_id}', [SnapshotsController::class, 'show'])->name('snapshots.requests.show');
+            Route::post('/{snapshot_request_id}/edit', [SnapshotsController::class, 'edit'])->name('snapshots.requests.edit');
+            Route::get('/{snapshot_request_id}/delete', [SnapshotsController::class, 'delete'])->name('snapshots.requests.delete');
         });
     });
 
