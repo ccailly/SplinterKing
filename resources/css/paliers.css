@@ -1,0 +1,310 @@
+.palier_container {
+    width: 100%;
+    max-width: 1280px;
+    margin: auto;
+    background: #000000;
+    border-radius: 12px;
+    padding-bottom: 45px;
+    padding-top: 35px;
+    margin-bottom: 150px;
+}
+.palier_container.palier_30 {
+    background: #f5ebdc;
+}
+.palier_container.palier_80 {
+    background: #e68987;
+}
+.palier_container.palier_120 {
+    background: #6eaaa0;
+}
+.palier_container.palier_140 {
+    background: #ff8732;
+}
+.palier_container.palier_180 {
+    background: #d62300;
+}
+.palier_container.palier_220 {
+    background: #063854;
+}
+.palier_container.palier_30 path {
+    fill: #ff8732;
+}
+.palier_container.palier_80 path {
+    fill: #d62300;
+}
+
+.palier_container.palier_120 path {
+    fill: #198737;
+}
+
+.palier_container.palier_140 path {
+    fill: #502314;
+}
+
+.palier_container.palier_180 path {
+    fill: #063854;
+}
+
+.palier_container.palier_220 path {
+    fill: #ffaa00;
+}
+.palier_container img {
+    display: block;
+    width: 100%;
+    margin: auto;
+}
+.palier_container > hr {
+    width: 92%;
+    margin: 30px auto;
+    border-color: #808080;
+}
+.palier_titre {
+    position: relative;
+    width: 160px;
+    margin: auto;
+    margin-top: -115px;
+}
+.palier_titre > span {
+    position: absolute;
+    bottom: 0px;
+    font-size: 55px;
+    color: #f5ebdc;
+    left: 0;
+    right: 0;
+    margin: auto;
+    font-family: "Flame Regular";
+    margin-bottom: -5px;
+    text-align: center;
+}
+.palier_titre > hr {
+    display: inline-block;
+    border: none;
+    width: 2px;
+    height: 40px;
+    background: #808080;
+    margin: 0 18px;
+    margin-bottom: -2px;
+}
+.palier_titre > .txt_white {
+    font-size: 35px !important;
+    margin-top: -12px;
+    display: inline-block;
+    vertical-align: middle;
+}
+.column-flex {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 95%;
+    margin: auto;
+    overflow-x: scroll;
+    gap: 0px 20px;
+}
+.palier_container > .column-flex {
+    padding-bottom: 35px;
+}
+.column-flex > div > img {
+    width: 100%;
+}
+.column-flex > div {
+    min-width: calc(20% - 20px);
+    margin-top: 6px;
+}
+.column-flex > div > p {
+    color: #f5ebdc;
+    font-family: "Flame Regular", arial, helvetica;
+    font-weight: 400;
+    font-size: 26px;
+    margin-top: 0;
+    padding: 0;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+}
+.palier_30 .column-flex > div > p {
+    color: #502314;
+}
+.palier_220 .palier_titre {
+    margin-bottom: -40px;
+}
+.palier_220 .column-flex {
+    justify-content: center;
+    overflow: auto;
+} /* ===== Scrollbar CSS ===== */ /* Firefox */
+.column-flex {
+    scrollbar-width: auto;
+    scrollbar-color: #f5ebdc #502314;
+} /* Chrome, Edge, and Safari */
+.column-flex::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+}
+.column-flex::-webkit-scrollbar-track {
+    background: #502314;
+    border-radius: 10px;
+}
+.column-flex::-webkit-scrollbar-thumb {
+    background-color: #f5ebdc;
+    border-radius: 10px;
+    border: 0px none #ffffff;
+}
+.palier_30 .column-flex::-webkit-scrollbar-thumb {
+    background-color: #de5b4f;
+}
+main footer,
+.gcvjsL {
+    background-color: #502314;
+    position: relative;
+}
+main footer:before,
+.gcvjsL:before {
+    content: "";
+    width: 100%;
+    height: 8px;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-top: -8px;
+    background-color: #e15441;
+}
+main footer:before,
+.gcvjsL:after {
+    content: "";
+    width: 100%;
+    height: 8px;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-top: -16px;
+    background-color: #ffaa00;
+}
+.sc-hZFzCs.dBXdCI,
+.sc-hZFzCs.cUPAYL {
+    background: #000;
+} /*MEDIAQUERIES*/
+@media screen and (max-width: 640px) {
+}
+@media screen and (max-width: 1280px) {
+    .palier_container {
+        width: 90%;
+    }
+}
+@media screen and (max-width: 1080px) {
+    .column-flex > div {
+        min-width: calc(25% - 20px);
+    }
+}
+@media screen and (max-width: 900px) {
+    .palier_container {
+        padding-top: 18px;
+        padding-bottom: 18px;
+        width: 90%;
+    } /*Gestion des produits*/
+    .container-flex {
+        overflow-x: scroll;
+        width: 90%;
+        margin: auto;
+    }
+    .container-flex {
+        padding: 15px;
+    }
+    .column-flex {
+        overflow: auto;
+        flex-wrap: wrap;
+        width: 150%;
+        gap: 0;
+        overflow-x: visible;
+    }
+    .column-flex > div {
+        min-width: 25%;
+        max-width: 25%;
+    }
+    .palier_80 .column-flex > div {
+        min-width: 33%;
+        max-width: 33%;
+    }
+    .palier_80 .column-flex {
+        width: 120%;
+    } /* Firefox */
+    .container-flex {
+        scrollbar-width: auto;
+        scrollbar-color: #f5ebdc #502314;
+        padding-bottom: 15px;
+    } /* Chrome, Edge, and Safari */
+    .container-flex::-webkit-scrollbar {
+        width: 14px;
+        height: 14px;
+    }
+    .container-flex::-webkit-scrollbar-track {
+        background: #502314;
+        border-radius: 10px;
+    }
+    .container-flex::-webkit-scrollbar-thumb {
+        background-color: #f5ebdc;
+        border-radius: 10px;
+        border: 0px none #ffffff;
+    }
+    .palier_30 .container-flex::-webkit-scrollbar-thumb {
+        background-color: #de5b4f;
+    }
+    .column-flex > div > p {
+        font-size: 17px;
+    }
+    .palier_220 .column-flex {
+        width: 100%;
+    }
+    .palier_220 .container-flex {
+        overflow: auto;
+    }
+    .palier_220 .column-flex > div {
+        min-width: 33%;
+        max-width: 33%;
+    }
+}
+@media screen and (max-width: 640px) {
+    .edito h2 {
+        font-size: 22px;
+    }
+    .edito h2 > span {
+        width: 13px;
+        top: 9px;
+    }
+    .couronnes img {
+        width: 13px;
+        margin-right: 11px;
+    }
+    a.bouton {
+        font-size: 17px;
+        padding: 12px 23px;
+    }
+    .palier_titre {
+        width: 90px;
+        margin-top: -65px;
+    }
+    .palier_titre > span {
+        font-size: 30px;
+    }
+    .palier_sous_titre {
+        transform: scale(0.5);
+        margin-top: -20px;
+        margin-bottom: -50px;
+    }
+    .column-flex > div > p {
+        font-size: 13px;
+    }
+    .palier_container {
+        margin-bottom: 80px;
+    }
+    .couronnes {
+        margin-bottom: 15px;
+    }
+    .edito h2 {
+        margin-bottom: 20px;
+    }
+}
+@media screen and (min-width: 640px) {
+    .hide_dk {
+        display: none;
+    }
+}
