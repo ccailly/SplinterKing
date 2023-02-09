@@ -5,34 +5,9 @@
         <div class="flex flex-row items-center justify-center w-full max-w-sm mx-auto">
 
             <div class="flex flex-col items-center justify-center w-full max-w-sm mx-auto mt-24">
-                @switch($preferedReward)
-                    @case('CR30')
-                        <x-rewardsOverlays.CR30 />
-                    @break
 
-                    @case('CR80')
-                        <x-rewardsOverlays.CR80 />
-                    @break
+                <x-palier :points="$preferedReward" />
 
-                    @case('CR120')
-                        <x-rewardsOverlays.CR140 />
-                    @break
-
-                    @case('CR140')
-                        <x-rewardsOverlays.CR140 />
-                    @break
-
-                    @case('CR180')
-                        <x-rewardsOverlays.CR180 />
-                    @break
-
-                    @case('CR220')
-                        <x-rewardsOverlays.CR220 />
-                    @break
-
-                    @default
-                        <x-rewardsOverlays.CR120 />
-                @endswitch
 
                 <form action="{{ route('drops.getReward') }}" method="POST">
                     @csrf
@@ -41,9 +16,15 @@
                             {{ $totalPreferedReward }} Drops</h3>
 
                         <div class="flex items-center justify-between px-3 py-2 bg-gray-200">
-                            <span class="font-bold text-gray-800">{{ $preferedReward }}</span>
-                            <input type="number" name="reward" class="hidden"
-                                value="{{ intval(str_replace('CR', '', $preferedReward)) }}">
+                            <span class="flex flex-row items-center font-bold text-gray-800">{{ $preferedReward }}
+                                <svg width="35" height="35" fill="#F7A800" class="pb-1" viewBox="0 0 24 24"
+                                    preserveAspectRatio="none">
+                                    <path
+                                        d="M12.34 15.874c4.993 0 8.375 1.167 8.965 2.106-.94 1.28-4.59 2.22-8.964 2.22-4.375 0-8.053-.94-8.965-2.22.59-.939 3.945-2.106 8.965-2.106zM12.26 4.15c.134-.199.403-.199.537 0l3.704 6.347c.107.17.322.227.483.085l4.026-3.586c.188-.199.51-.028.51.256v9.534c-1.637-1.366-5.368-2.05-9.206-2.05-3.704 0-7.596.77-9.314 2.05V7.25c0-.284.295-.455.51-.284l4.402 3.728c.134.114.349.085.456-.086l3.892-6.46z"
+                                        fill-rule="evenodd"></path>
+                                </svg>
+                            </span>
+                            <input type="number" name="reward" class="hidden" value="{{ $preferedReward }}">
                             <button
                                 class="px-2 py-1 text-xs font-semibold text-white uppercase transition-colors duration-300 transform bg-gray-800 rounded hover:bg-gray-700 focus:bg-gray-700 focus:outline-none">Récuperer</button>
                         </div>
@@ -167,8 +148,8 @@
                                     <h3 class="text-3xl font-extrabold leading-6 text-gray-900" id="modal-title">
                                         {{ Request::get('reward') }}
                                     </h3>
-                                    <svg width="35" height="35" fill="#F7A800" class="pb-1" viewBox="0 0 24 24"
-                                        preserveAspectRatio="none">
+                                    <svg width="35" height="35" fill="#F7A800" class="pb-1"
+                                        viewBox="0 0 24 24" preserveAspectRatio="none">
                                         <path
                                             d="M12.34 15.874c4.993 0 8.375 1.167 8.965 2.106-.94 1.28-4.59 2.22-8.964 2.22-4.375 0-8.053-.94-8.965-2.22.59-.939 3.945-2.106 8.965-2.106zM12.26 4.15c.134-.199.403-.199.537 0l3.704 6.347c.107.17.322.227.483.085l4.026-3.586c.188-.199.51-.028.51.256v9.534c-1.637-1.366-5.368-2.05-9.206-2.05-3.704 0-7.596.77-9.314 2.05V7.25c0-.284.295-.455.51-.284l4.402 3.728c.134.114.349.085.456-.086l3.892-6.46z"
                                             fill-rule="evenodd"></path>

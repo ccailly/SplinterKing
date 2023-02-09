@@ -211,7 +211,7 @@
             @foreach ($rewards[$points] as $reward)
                 <div>
                     <img src="{{ $reward['url'] }}" style="max-width:220px" />
-                    <p>
+                    <p class="text-center">
                         {!! wordwrap($reward['name'], 15, '<br/>') !!}
                     </p>
                 </div>
