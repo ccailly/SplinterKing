@@ -15,7 +15,9 @@ class SnapshotsController extends Controller
     {
         $snapshots_request_page = $request->query('snapshots_request_page', 1);
         $snapshots_request_per_page = 30.0;
-        $snapshots_request = SnapshotRequest::select('snapshot_requests.id', 'account_id', 'priority', 'status', 'user_id', 'requested_at')
+        $snapshots_request = SnapshotRequest::leftJoin('accounts', 'accounts.id', '=', 'snapshot_requests.account_id')
+            ->leftJoin('users', 'users.id', '=', 'snapshot_requests.user_id')
+            ->select('snapshot_requests.id', 'accounts.mail', 'priority', 'status', 'users.name', 'requested_at')
             ->whereIn('status', ['pending', 'processing'])
             ->orderByDesc('priority');
         $total_snapshots_request = $snapshots_request->get()->count();
@@ -39,15 +41,17 @@ class SnapshotsController extends Controller
         $snapshots_sort = $request->query('sort', 'captured_at');
         $snapshots_search = $request->query('search', '');
         $snapshots_per_page = 30.0;
-        $snapshots = SnapshotRequest::leftjoin('snapshots', 'snapshots.snapshot_request_id', '=', 'snapshot_requests.id')
+        $snapshots = SnapshotRequest::leftJoin('accounts', 'accounts.id', '=', 'snapshot_requests.account_id')
+            ->leftJoin('users', 'users.id', '=', 'snapshot_requests.user_id')
+            ->leftjoin('snapshots', 'snapshots.snapshot_request_id', '=', 'snapshot_requests.id')
             ->leftjoin('coupons', 'coupons.snapshot_id', '=', 'snapshots.id')
             ->whereIn('snapshot_requests.status', ['completed', 'failed'])
             ->orWhere('snapshots.account_id', 'like', '%' . $snapshots_search . '%')
             ->orWhere('snapshots.user_id', 'like', '%' . $snapshots_search . '%')
             ->orWhere('snapshots.points', 'like', '%' . $snapshots_search . '%')
             ->orWhere('snapshots.captured_at', 'like', '%' . $snapshots_search . '%')
-            ->select('snapshot_requests.account_id', 'snapshot_requests.user_id', 'snapshot_requests.status', DB::raw('IFNULL(points, 0)'), DB::raw('count(coupons.snapshot_id) as nb_coupons'), DB::raw('IFNULL(captured_at, requested_at) as captured_at'))
-            ->groupBy('snapshots.id', 'snapshots.points', 'snapshots.captured_at', 'snapshot_requests.account_id', 'snapshot_requests.user_id', 'snapshot_requests.status', 'snapshot_requests.requested_at')
+            ->select('accounts.mail', 'users.name', 'snapshot_requests.status', DB::raw('IFNULL(points, 0)'), DB::raw('count(coupons.snapshot_id) as nb_coupons'), DB::raw('IFNULL(captured_at, requested_at) as captured_at'))
+            ->groupBy('snapshots.id', 'snapshots.points', 'snapshots.captured_at', 'accounts.mail', 'users.name', 'snapshot_requests.status', 'snapshot_requests.requested_at')
             ->orderByDesc($snapshots_sort);
 
         $total_snapshots = $snapshots->get()->count();
