@@ -82,7 +82,7 @@ class RunSnapshot extends Command
             return Command::FAILURE;
         }
 
-        $this->info($result);
+        $this->info($resultRaw);
         $this->info('✅ Snapshot information retrieved');
 
         // Create the snapshot
