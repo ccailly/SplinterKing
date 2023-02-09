@@ -5,6 +5,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\SnapshotsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DropController;
+use App\Http\Controllers\RankingController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +28,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/getReward', [DropController::class, 'getReward'])->name('drops.getReward');
     });
 
+    Route::prefix('/ranking')->group(function () {
+        Route::get('/', [RankingController::class, 'shows'])->name('ranking.shows');
+    });
 
     Route::prefix('accounts')->group(function () {
         Route::get('/', [AccountController::class, 'shows'])->name('accounts.shows');
