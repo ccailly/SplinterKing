@@ -31,7 +31,7 @@ class DropController extends Controller
 
 
         return view('drops.drop', [
-            'preferedReward' => $preferedReward ? $preferedReward->reward : "CR120",
+            'preferedReward' => $preferedReward ? intval(str_replace('CR', '', $preferedReward->reward)) : "120",
             'total' => $totalDrops,
             'totalPreferedReward' => $totalPreferedReward,
             'rewards' => $rewards,
