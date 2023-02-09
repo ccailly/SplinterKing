@@ -64,8 +64,9 @@ class RunSnapshot extends Command
         // Execute the python script and get the json result
         try {
             $resultRaw = ShellCommand::execute('python3.10 ./scripts/snapshot/snapshot.py ' . $account->mail . ' ' . $account->password);
-            if (isset($resultRaw['error']))
-                throw new Exception($resultRaw['error']);
+            $result = json_decode($resultRaw, true);
+            if (isset($result['error']))
+                throw new Exception($result['error']);
         } catch (Exception $e) {
             $this->error('⛔ ' . $e->getMessage());
 
@@ -81,8 +82,7 @@ class RunSnapshot extends Command
             return Command::FAILURE;
         }
 
-        $this->info($resultRaw);
-        $result = json_decode($resultRaw, true);
+        $this->info($result);
         $this->info('✅ Snapshot information retrieved');
 
         // Create the snapshot
