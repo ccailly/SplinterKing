@@ -1,10 +1,10 @@
 <x-app-layout>
 
-    <div class="flex flex-col items-center justify-center w-full max-w-sm mx-auto py-24 gap-28">
+    <div class="flex flex-col items-center justify-center w-full mx-auto py-24 gap-28">
 
-        <div class="flex flex-row items-center justify-center w-full max-w-sm mx-auto">
+        <div class="flex flex-row items-center justify-center w-full mx-auto">
 
-            <div class="flex flex-col items-center justify-center w-full max-w-sm mx-auto mt-24">
+            <div class="flex flex-col items-center justify-center w-full mx-auto mt-24">
 
                 <x-palier :points="$preferedReward" />
 
