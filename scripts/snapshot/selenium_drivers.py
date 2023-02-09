@@ -2,6 +2,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
+from fake_useragent import UserAgent
+
 from kingToken import Token
 from kingdom import Kingdom
 from kingProfile import Profile
@@ -15,6 +17,12 @@ def get_driver():
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-ssl-errors=yes')
     options.add_argument('--ignore-certificate-errors')
+
+    # Fake user agent
+    ua = UserAgent()
+    user_agent = ua.random
+    options.add_argument(f'user-agent={user_agent}')
+
     caps = DesiredCapabilities.CHROME
     caps['goog:loggingPrefs'] = {'performance': 'ALL'}
     driver = webdriver.Remote(
@@ -30,7 +38,8 @@ def login(driver, mail, password):
     driver.get("https://www.burgerking.fr/connexion")
     # Check if the cookie banner is present
     try:
-        cookie = driver.find_element(By.XPATH, "//button[contains(text(), 'Tout refuser') and @color='#BB1E32']")
+        cookie = driver.find_element(
+            By.XPATH, "//button[contains(text(), 'Tout refuser') and @color='#BB1E32']")
         if cookie:
             cookie.click()
     except Exception as e:
@@ -47,14 +56,15 @@ def login(driver, mail, password):
     cpt = 0
     while cpt < 10:
         try:
-            btn = driver.find_element(By.XPATH, "//button[@type='submit' and contains(text(), 'Me connecter')]")
+            btn = driver.find_element(
+                By.XPATH, "//button[@type='submit' and contains(text(), 'Me connecter')]")
             btn.click()
             time.sleep(1)
         except Exception as e:
             break
 
         cpt += 1
-    
+
     if cpt >= 10:
         raise Exception("Could not login, probably temporary ban.")
 
