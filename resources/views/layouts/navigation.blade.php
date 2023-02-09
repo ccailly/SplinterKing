@@ -40,7 +40,7 @@
                         Comptes
                     </a>
                     <a href="{{ route('snapshots.shows') }}"
-                        class="px-3 py-2 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-md lg:mt-0  hover:bg-gray-100 @if (Route::currentRouteName() == 'snapshots.index') bg-gray-100 @endif">
+                        class="px-3 py-2 mx-3 mt-2 text-gray-700 transition-colors duration-300 transform rounded-md lg:mt-0  hover:bg-gray-100 @if (Route::currentRouteName() == 'snapshots.shows') bg-gray-100 @endif">
                         Snapshots
                     </a>
                     <a href="#"

@@ -30,6 +30,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('/ranking')->group(function () {
         Route::get('/', [RankingController::class, 'shows'])->name('ranking.shows');
+        Route::get('/wheels', [RankingController::class, 'showsWheelsRanking'])->name('ranking.wheels');
+        ROute::get('/eater', [RankingController::class, 'showsEatersRanking'])->name('ranking.eaters');
     });
 
     Route::prefix('accounts')->group(function () {
