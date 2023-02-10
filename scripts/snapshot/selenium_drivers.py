@@ -19,9 +19,9 @@ def get_driver():
     options.add_argument('--ignore-certificate-errors')
 
     # Fake user agent
-    ua = UserAgent()
-    user_agent = ua.random
-    options.add_argument(f'user-agent={user_agent}')
+    # ua = UserAgent()
+    # user_agent = ua.random
+    # options.add_argument(f'user-agent={user_agent}')
 
     caps = DesiredCapabilities.CHROME
     caps['goog:loggingPrefs'] = {'performance': 'ALL'}
@@ -54,12 +54,12 @@ def login(driver, mail, password):
     password_input.send_keys(password)
 
     cpt = 0
-    while cpt < 10:
+    while cpt < 30:
         try:
             btn = driver.find_element(
                 By.XPATH, "//button[@type='submit' and contains(text(), 'Me connecter')]")
             btn.click()
-            time.sleep(1)
+            time.sleep(3)
         except Exception as e:
             break
 
