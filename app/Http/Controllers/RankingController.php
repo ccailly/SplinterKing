@@ -56,8 +56,10 @@ class RankingController extends Controller
             DB::raw('IFNULL(reward_subquery.reward, "Aucun") as info')
         )
             ->leftJoin('account_uses', 'users.id', '=', 'account_uses.user_id')
-            ->leftJoin(DB::raw('(SELECT user_id, reward FROM account_uses WHERE reward IS NOT NULL GROUP BY user_id, reward ORDER BY COUNT(*) DESC LIMIT 1) reward_subquery'), function ($join) {
-                $join->on('reward_subquery.user_id', '=', 'users.id');
+            ->leftJoin(DB::raw('(SELECT id, (
+                SELECT reward from account_uses au WHERE u.id = au.user_id  GROUP BY user_id , reward ORDER BY COUNT(reward) DESC LIMIT 1 
+            ) as reward FROM users u ORDER BY id ASC) reward_subquery'), function ($join) {
+                $join->on('reward_subquery.id', '=', 'users.id');
             })
             ->groupBy('users.id', 'users.name', 'reward_subquery.reward')
             ->orderBy('user_rank', 'asc')
