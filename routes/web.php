@@ -24,7 +24,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::redirect('/dashboard', '/');
 
     Route::prefix('drops')->group(function () {
-        Route::get('/', [DropController::class, 'index'])->name('drops.index');
+        Route::get('/', [DropController::class, 'showCrowns'])->name('drops.index');
+        Route::get('/crowns', [DropController::class, 'showCrowns'])->name('drops.crowns');
+        Route::get('/coupons', [DropController::class, 'showCoupons'])->name('drops.coupons');
         Route::post('/getReward', [DropController::class, 'getReward'])->name('drops.getReward');
     });
 

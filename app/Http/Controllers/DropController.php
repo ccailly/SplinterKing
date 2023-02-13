@@ -11,10 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 class DropController extends Controller
 {
-    public function index()
+    public function showCrowns()
     {
-        $preferedReward = AccountUse::select('reward')->groupBy('reward')->orderByRaw('COUNT(*) DESC')->first();
-        $totalDrops = AccountUse::count();
+        $preferedReward = AccountUse::select('reward')->groupBy('reward')->orderByRaw('COUNT(*) DESC')->first() ? AccountUse::select('reward')->groupBy('reward')->orderByRaw('COUNT(*) DESC')->first() : 'Aucune';
+        $totalDrops = AccountUse::count() ? AccountUse::count() : 'Aucun';
         $totalPreferedReward = $preferedReward ? AccountUse::where('reward', $preferedReward->reward)->count() : 'Aucun';
 
         $rewards = Snapshot::select('points', DB::raw('count(*) as total'))
@@ -29,6 +29,31 @@ class DropController extends Controller
             ->orderBy('points', 'desc')
             ->get();
 
+        return view('drops.drop', [
+            'preferedReward' => $preferedReward ? intval(str_replace('CR', '', $preferedReward->reward)) : "120",
+            'total' => $totalDrops,
+            'totalPreferedReward' => $totalPreferedReward,
+            'rewards' => $rewards,
+        ]);
+    }
+
+    public function showCoupons()
+    {
+        $preferedReward = AccountUse::select('reward')->groupBy('reward')->orderByRaw('COUNT(*) DESC')->first() ? AccountUse::select('reward')->groupBy('reward')->orderByRaw('COUNT(*) DESC')->first() : 'Aucune';
+        $totalDrops = AccountUse::count() ? AccountUse::count() : 'Aucun';
+        $totalPreferedReward = $preferedReward ? AccountUse::where('reward', $preferedReward->reward)->count() : 'Aucun';
+
+        $rewards = Snapshot::select('points', DB::raw('count(*) as total'))
+            ->fromSub(function ($query) {
+                $query->select('snapshots.*')
+                      ->selectRaw('(SELECT MAX(used_at) FROM account_uses WHERE snapshots.account_id = account_uses.account_id) AS latest_used_at')
+                      ->from('snapshots')
+                      ->leftJoin('account_uses', 'snapshots.account_id', '=', 'account_uses.account_id');
+            }, 'subquery')
+            ->whereRaw('subquery.captured_at > subquery.latest_used_at')
+            ->groupBy('points')
+            ->orderBy('points', 'desc')
+            ->get();
 
         return view('drops.drop', [
             'preferedReward' => $preferedReward ? intval(str_replace('CR', '', $preferedReward->reward)) : "120",
