@@ -56,7 +56,7 @@ class DropController extends Controller
             ->get();
 
         return view('drops.drop', [
-            'preferedReward' => $preferedReward ? intval(str_replace('CR', '', $preferedReward->reward)) : "120",
+            'preferedReward' => $preferedReward != 'Aucune' ? intval(str_replace('CR', '', $preferedReward->reward)) : $preferedReward,
             'total' => $totalDrops,
             'totalPreferedReward' => $totalPreferedReward,
             'rewards' => $rewards,
