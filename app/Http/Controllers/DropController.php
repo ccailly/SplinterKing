@@ -15,7 +15,7 @@ class DropController extends Controller
     {
         $preferedReward = AccountUse::select('reward')->groupBy('reward')->orderByRaw('COUNT(*) DESC')->first() ? AccountUse::select('reward')->groupBy('reward')->orderByRaw('COUNT(*) DESC')->first() : 'Aucune';
         $totalDrops = AccountUse::count() ? AccountUse::count() : 'Aucun';
-        $totalPreferedReward = $preferedReward ? AccountUse::where('reward', $preferedReward->reward)->count() : 'Aucun';
+        $totalPreferedReward = $preferedReward != 'Aucune' ? AccountUse::where('reward', $preferedReward->reward)->count() : 0;
 
         $rewards = Snapshot::select('points', DB::raw('count(*) as total'))
             ->fromSub(function ($query) {
