@@ -158,7 +158,7 @@
                 </p>
 
                 <h1
-                    class="flex flex-row justify-center mt-4 text-2xl font-semibold text-center text-gray-800 capitalize lg:text-3xl">
+                    class="flex flex-row justify-center mt-4 text-2xl font-flame text-center text-gray-800 capitalize lg:text-3xl">
                     <svg width="35" height="35" fill="#F7A800" class="crown" viewBox="0 0 24 24"
                         preserveAspectRatio="none">
                         <path

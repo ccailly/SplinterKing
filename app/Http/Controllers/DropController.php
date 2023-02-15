@@ -15,6 +15,7 @@ use Carbon\Carbon;
 
 class DropController extends Controller
 {
+
     public function showCrowns()
     {
         $preferedReward = AccountUse::select('reward')->groupBy('reward')->orderByRaw('COUNT(*) DESC')->first() ? AccountUse::select('reward')->groupBy('reward')->orderByRaw('COUNT(*) DESC')->first() : 'Aucune';
@@ -42,7 +43,21 @@ class DropController extends Controller
             ->get()
             ->toArray();
 
+            $newAccountSnapshot = Snapshot::select('snapshots.account_id', 'snapshots.points', DB::raw('MAX(snapshots.captured_at) as max_date'))
+            ->whereNotNull('snapshots.points')
+            ->whereNotIn('snapshots.account_id', function($query) {
+                $query->select('account_uses.account_id')->from('account_uses');
+            })
+            ->whereNotIn('snapshots.account_id', function($query) {
+                $query->select('wheels.account_id')->from('wheels');
+            })
+            ->groupBy('snapshots.account_id', 'snapshots.points')
+            ->orderBy('snapshots.account_id', 'asc')
+            ->get()
+            ->toArray();
+
         $rewards = [];
+
 
         foreach ($wheels as $wheel) {
             $accountId = $wheel['account_id'];
@@ -100,6 +115,23 @@ class DropController extends Controller
                 }
             }
         }
+        foreach($newAccountSnapshot as $newAccountSnap){
+            $found = false;
+            foreach ($rewards as &$reward) {
+                if ($reward['points'] === $newAccountSnap['points']) {
+                    $reward['total']++;
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $rewards[] = [
+                    'points' => $newAccountSnap['points'],
+                    'total' => 1,
+                ];
+            }
+        }
+
 
 
         // Tri des résultats par points
@@ -108,13 +140,13 @@ class DropController extends Controller
         });
 
 
-        // $array est le tableau d'origine
         $collection = collect($rewards);
 
         // Transformation en objets
         $rewards = $collection->map(function ($item) {
             return (object) $item;
         });
+
 
         //dd($rewards);
 
@@ -153,6 +185,8 @@ class DropController extends Controller
 
         $rewardPoints = $request->input('reward');
 
+        $availableAccounts = [];
+
         $accountUses = AccountUse::select('account_uses.account_id', DB::raw('CONVERT(SUBSTRING_INDEX(account_uses.reward, "CR", -1), SIGNED) as points'), DB::raw('MAX(account_uses.used_at) as max_date'), DB::raw('user_id as author'))
             ->where('account_uses.reward', 'like', '%CR' . $rewardPoints)
             ->groupBy('account_uses.account_id', 'points', 'author')
@@ -175,45 +209,104 @@ class DropController extends Controller
             ->get()
             ->toArray();
 
-        $availableAccounts = [];
+        $newAccountSnapshots = Snapshot::select('snapshots.account_id', 'snapshots.points', DB::raw('MAX(snapshots.captured_at) as max_date'), DB::raw('user_id as author'))
+            ->where('snapshots.points', '=', $rewardPoints)
+            ->whereNotNull('snapshots.points')
+            ->whereNotIn('snapshots.account_id', function ($query) {
+                $query->select('account_uses.account_id')
+                    ->from('account_uses');
+            })
+            ->whereNotIn('snapshots.account_id', function ($query) {
+                $query->select('wheels.account_id')
+                    ->from('wheels');
+            })
+            ->groupBy('snapshots.account_id', 'snapshots.points', 'author')
+            ->orderBy('snapshots.account_id', 'asc')
+            ->get()
+            ->toArray();
+
+
+        // foreach ($wheels as $wheel) {
+        //     $accountId = $wheel['account_id'];
+        //     $points = $wheel['points'];
+        //     $maxDate = $wheel['max_date'];
+        //     $author = $wheel['author'];
+
+        //     $available = true;
+
+        //     foreach ($accountUses as $accountUse) {
+        //         if ($accountUse['account_id'] === $accountId && $accountUse['max_date'] > $maxDate) {
+        //             $maxDate = $accountUse['max_date'];
+        //             $available = false;
+        //             break;
+        //         }
+        //     }
+
+        //     foreach ($snapshots as $snapshot) {
+        //         if ($snapshot['account_id'] === $accountId && $snapshot['max_date'] > $maxDate) {
+        //             $available = false;
+        //             $availableAccounts[] = [
+        //                 'account_id' => $accountId,
+        //                 'points' => $snapshot['points'],
+        //                 'max_date' => $snapshot['max_date'],
+        //                 'author' => $snapshot['author'],
+        //             ];
+        //             break;
+        //         }
+        //     }
+
+        //     if ($available) {
+        //         $availableAccounts[] = [
+        //             'account_id' => $accountId,
+        //             'points' => $points,
+        //             'max_date' => $maxDate,
+        //             'author' => $author,
+        //         ];
+        //     }
+        // }
 
         foreach ($wheels as $wheel) {
             $accountId = $wheel['account_id'];
             $points = $wheel['points'];
             $maxDate = $wheel['max_date'];
             $author = $wheel['author'];
+            $maxDateAccountUse = null;
 
-            $available = true;
+            $addReward = true;
 
             foreach ($accountUses as $accountUse) {
-                if ($accountUse['account_id'] === $accountId && $accountUse['max_date'] > $maxDate) {
-                    $maxDate = $accountUse['max_date'];
-                    $available = false;
+                if ($accountUse['account_id'] === $accountId && $accountUse['points'] === $points && $accountUse['max_date'] > $maxDate) {
+                    $maxDateAccountUse = $accountUse['max_date'];
+                    $addReward = false;
                     break;
                 }
             }
 
             foreach ($snapshots as $snapshot) {
-                if ($snapshot['account_id'] === $accountId && $snapshot['max_date'] > $maxDate) {
-                    $available = false;
+                if ($snapshot['account_id'] === $accountId && $snapshot['points'] === $points && $snapshot['max_date'] > $maxDate && $snapshot['max_date'] > $maxDateAccountUse) {
                     $availableAccounts[] = [
-                        'account_id' => $accountId,
                         'points' => $snapshot['points'],
-                        'max_date' => $snapshot['max_date'],
+                        'account_id' => $snapshot['account_id'],
                         'author' => $snapshot['author'],
                     ];
                     break;
                 }
             }
 
-            if ($available) {
+            if ($addReward) {
                 $availableAccounts[] = [
-                    'account_id' => $accountId,
                     'points' => $points,
-                    'max_date' => $maxDate,
+                    'account_id' => $accountId,
                     'author' => $author,
                 ];
             }
+        }
+        foreach($newAccountSnapshots as $newAccountSnapshot) {
+            $availableAccounts[] = [
+                'points' => $newAccountSnapshot['points'],
+                'account_id' => $newAccountSnapshot['account_id'],
+                'author' => $newAccountSnapshot['author'],
+            ];
         }
 
         //dd($availableAccounts);
@@ -250,7 +343,7 @@ class DropController extends Controller
             ->orderBy('account_uses.used_at', 'desc')
             ->get();
 
-            $totalDrops = AccountUse::select(DB::raw('COUNT(*) as total'))
+        $totalDrops = AccountUse::select(DB::raw('COUNT(*) as total'))
             ->where('account_uses.user_id', '=', Auth::user()->id)
             ->get();
 
@@ -259,6 +352,5 @@ class DropController extends Controller
             'myDrops' => $myDrops,
             'totalDrops' => $totalDrops->first()->total,
         ]);
-
     }
 }
