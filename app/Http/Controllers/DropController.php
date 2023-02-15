@@ -21,52 +21,102 @@ class DropController extends Controller
         $totalDrops = AccountUse::count() ? AccountUse::count() : 'Aucun';
         $totalPreferedReward = $preferedReward != 'Aucune' ? AccountUse::where('reward', $preferedReward->reward)->count() : 0;
 
-        // $rewards = Snapshot::select('points', DB::raw('count(*) as total'))
-        //     ->fromSub(function ($query) {
-        //         $query->select('snapshots.*')
-        //             ->selectRaw('(SELECT MAX(used_at) FROM account_uses WHERE snapshots.account_id = account_uses.account_id) AS latest_used_at')
-        //             ->from('snapshots')
-        //             ->leftJoin('account_uses', 'snapshots.account_id', '=', 'account_uses.account_id');
-        //     }, 'subquery')
-        //     ->whereRaw('subquery.captured_at > subquery.latest_used_at')
-        //     ->groupBy('points')
-        //     ->orderBy('points', 'desc')
-        //     ->get();
+
+        $accountUses = AccountUse::select('account_uses.account_id', DB::raw('CONVERT(SUBSTRING_INDEX(account_uses.reward, "CR", -1), SIGNED) as points'), DB::raw('MAX(account_uses.used_at) as max_date'))
+            ->groupBy('account_uses.account_id', 'points')
+            ->orderBy('account_uses.account_id', 'asc')
+            ->get()
+            ->toArray();
 
         $wheels = Wheel::select('wheels.account_id', DB::raw('CONVERT(SUBSTRING_INDEX(wheels.reward, "CR", -1), SIGNED) as points'), DB::raw('MAX(wheels.catched_at) as max_date'))
-            ->rightJoin('account_uses', 'wheels.account_id', '=', 'account_uses.account_id', 'and', 'wheels.catched_at', '>', 'account_uses.used_at', 'and', 'wheels.reward', '=', 'account_uses.reward')
             ->groupBy('wheels.account_id', 'points')
             ->orderBy('wheels.account_id', 'asc')
-            ->get();
+            ->get()
+            ->toArray();
+
 
         $snapshots = Snapshot::select('snapshots.account_id', 'snapshots.points', DB::raw('MAX(snapshots.captured_at) as max_date'))
-            ->rightJoin('account_uses', 'snapshots.account_id', '=', 'account_uses.account_id', 'and', 'snapshots.captured_at', '>', 'account_uses.used_at', 'and', 'snapshots.points', '=', 'SUBSTRING_INDEX(account_uses.reward, "CR", -1)')
             ->whereNotNull('snapshots.points')
             ->groupBy('snapshots.account_id', 'snapshots.points')
             ->orderBy('snapshots.account_id', 'asc')
-            ->get();
+            ->get()
+            ->toArray();
 
-        $merged = $wheels->concat($snapshots)->groupBy('account_id');
+        $rewards = [];
 
-        $rewards = collect();
-        foreach ($merged as $group) {
-            $reward = $group->sortByDesc('max_date')->first();
-            $rewards->push(
-                (object) [
-                    'points' => $reward['points'],
-                    'total' => $group->count(),
-                ]
-            );
+        foreach ($wheels as $wheel) {
+            $accountId = $wheel['account_id'];
+            $points = $wheel['points'];
+            $maxDate = $wheel['max_date'];
+            $maxDateAccountUse = null;
+
+            $addReward = true;
+
+            foreach ($accountUses as $accountUse) {
+                if ($accountUse['account_id'] === $accountId && $accountUse['points'] === $points && $accountUse['max_date'] > $maxDate) {
+                    $maxDateAccountUse = $accountUse['max_date'];
+                    $addReward = false;
+                    break;
+                }
+            }
+
+            foreach ($snapshots as $snapshot) {
+                if ($snapshot['account_id'] === $accountId && $snapshot['points'] === $points && $snapshot['max_date'] > $maxDate && $snapshot['max_date'] > $maxDateAccountUse) {
+                    $addReward = false;
+                    $found = false;
+                    foreach ($rewards as &$reward) {
+                        if ($reward['points'] === $snapshot['points']) {
+                            $reward['total']++;
+                            $found = true;
+                            break;
+                        }
+                    }
+                    if (!$found) {
+                        $rewards[] = [
+                            'points' => $snapshot['points'],
+                            'total' => 1,
+                        ];
+                    }
+                    break;
+                }
+            }
+
+            if ($addReward) {
+                $found = false;
+
+                foreach ($rewards as &$reward) {
+                    if ($reward['points'] === $points) {
+                        $reward['total']++;
+                        $found = true;
+                        break;
+                    }
+                }
+
+                if (!$found) {
+                    $rewards[] = [
+                        'points' => $points,
+                        'total' => 1,
+                    ];
+                }
+            }
         }
 
-        $rewards = $rewards->groupBy('points')->map(function ($group) {
-            return (object) [
-                'points' => $group->first()->points,
-                'total' => $group->sum('total'),
-            ];
+
+        // Tri des résultats par points
+        usort($rewards, function ($a, $b) {
+            return $b['points'] - $a['points'];
         });
 
-        $rewards = $rewards->sortByDesc('points');
+
+        // $array est le tableau d'origine
+        $collection = collect($rewards);
+
+        // Transformation en objets
+        $rewards = $collection->map(function ($item) {
+            return (object) $item;
+        });
+
+        //dd($rewards);
 
         return view('drops.drop', [
             'preferedReward' => $preferedReward != 'Aucune' ? intval(str_replace('CR', '', $preferedReward->reward)) : $preferedReward,
@@ -101,74 +151,91 @@ class DropController extends Controller
             return redirect()->route('drops.index')->with('error', ['title' => 'Erreur', 'message' => 'Le gain n\'a pas été demandé ou ne respecte pas le format']);
         }
 
+        $rewardPoints = $request->input('reward');
 
-        //verifier si le reward est bien un reward existant
-        $reward = Snapshot::select('points')->where('points', $request->reward)->first();
-        if ($reward) {
-            $reward = $reward->points;
+        $accountUses = AccountUse::select('account_uses.account_id', DB::raw('CONVERT(SUBSTRING_INDEX(account_uses.reward, "CR", -1), SIGNED) as points'), DB::raw('MAX(account_uses.used_at) as max_date'), DB::raw('user_id as author'))
+            ->where('account_uses.reward', 'like', '%CR' . $rewardPoints)
+            ->groupBy('account_uses.account_id', 'points', 'author')
+            ->orderBy('account_uses.account_id', 'asc')
+            ->get()
+            ->toArray();
 
-            $wheels = Wheel::select('wheels.account_id', DB::raw('CONVERT(SUBSTRING_INDEX(wheels.reward, "CR", -1), SIGNED) as points'), DB::raw('MAX(wheels.catched_at) as max_date'), 'wheels.user_id')
-                ->rightJoin('account_uses', 'wheels.account_id', '=', 'account_uses.account_id', 'and', 'wheels.catched_at', '>', 'account_uses.used_at', 'and', 'wheels.reward', '=', 'account_uses.reward')
-                ->where('wheels.reward', 'CR' . $reward)
-                ->groupBy('wheels.account_id', 'points', 'wheels.user_id')
-                ->orderBy('wheels.account_id', 'asc')
-                ->get();
+        $wheels = Wheel::select('wheels.account_id', DB::raw('CONVERT(SUBSTRING_INDEX(wheels.reward, "CR", -1), SIGNED) as points'), DB::raw('MAX(wheels.catched_at) as max_date'), DB::raw('user_id as author'))
+            ->where('wheels.reward', 'like', '%CR' . $rewardPoints)
+            ->groupBy('wheels.account_id', 'points', 'author')
+            ->orderBy('wheels.account_id', 'asc')
+            ->get()
+            ->toArray();
 
-            $snapshots = Snapshot::select('snapshots.account_id', 'snapshots.points', DB::raw('MAX(snapshots.captured_at) as max_date'), 'snapshots.user_id')
-                ->rightJoin('account_uses', 'snapshots.account_id', '=', 'account_uses.account_id', 'and', 'snapshots.captured_at', '>', 'account_uses.used_at', 'and', 'snapshots.points', '=', 'SUBSTRING_INDEX(account_uses.reward, "CR", -1)')
-                ->whereNotNull('snapshots.points')
-                ->where('snapshots.points', $reward)
-                ->groupBy('snapshots.account_id', 'snapshots.points', 'snapshots.user_id')
-                ->orderBy('snapshots.account_id', 'asc')
-                ->get();
+        $snapshots = Snapshot::select('snapshots.account_id', 'snapshots.points', DB::raw('MAX(snapshots.captured_at) as max_date'), DB::raw('user_id as author'))
+            ->where('snapshots.points', '=', $rewardPoints)
+            ->whereNotNull('snapshots.points')
+            ->groupBy('snapshots.account_id', 'snapshots.points', 'author')
+            ->orderBy('snapshots.account_id', 'asc')
+            ->get()
+            ->toArray();
 
-            //recuperer le qrcode et l'id du compte avec le reward correspondant. Utiliser la meme logique que la methode showCrowns
+        $availableAccounts = [];
+        
+        foreach ($wheels as $wheel) {
+            $accountId = $wheel['account_id'];
+            $points = $wheel['points'];
+            $maxDate = $wheel['max_date'];
+            $author = $wheel['author'];
 
-            $merged = $wheels->concat($snapshots)->groupBy('account_id');
+            $available = true;
 
-            $rewards = collect();
-            foreach ($merged as $group) {
-                $reward = $group->sortByDesc('max_date')->first();
-                $rewards->push(
-                    (object) [
-                        'points' => $reward['points'],
-                        'account_id' => $reward['account_id'],
-                        'user_id' => $reward['user_id'],
-                    ]
-                );
+            foreach ($accountUses as $accountUse) {
+                if ($accountUse['account_id'] === $accountId && $accountUse['max_date'] > $maxDate){
+                    $maxDate = $accountUse['max_date'];
+                    $available = false;
+                    break;
+                }
             }
 
-            $compte = Account::select('accounts.qr_code', 'accounts.id')
-                ->where('accounts.id', $rewards->first()->account_id)
-                ->first();
-
-            $user = User::select('users.name')
-                ->where('users.id', $rewards->first()->user_id)
-                ->first();
-
-
-            if (!$compte) {
-                return redirect()->route('drops.index')->with('error', ['title' => 'Erreur', 'message' => 'Ce gain n\'est plus disponible']);
+            foreach ($snapshots as $snapshot) {
+                if ($snapshot['account_id'] === $accountId && $snapshot['max_date'] > $maxDate) {
+                    $available = false;
+                    $availableAccounts[] = [
+                        'account_id' => $accountId,
+                        'points' => $snapshot['points'],
+                        'max_date' => $snapshot['max_date'],
+                        'author' => $snapshot['author'],
+                    ];
+                    break;
+                }
             }
 
-            $add = AccountUse::create([
-                'account_id' => $compte->id,
-                'user_id' => Auth::user()->id,
-                'reward' => "CR" . $reward,
-                'used_at' => now(),
-            ]);
-
-            if (!$add) {
-                return redirect()->route('drops.index')->with('error', ['title' => 'Erreur', 'message' => 'Ce gain n\'est plus disponible']);
+            if ($available) {
+                $availableAccounts[] = [
+                    'account_id' => $accountId,
+                    'points' => $points,
+                    'max_date' => $maxDate,
+                    'author' => $author,
+                ];
             }
-        } else {
-            return redirect()->route('drops.index')->with('error', ['title' => 'Erreur', 'message' => 'Ce gain n\'est plus disponible']);
         }
+
+        //dd($availableAccounts);
+
+        if (count($availableAccounts) === 0) {
+            return redirect()->route('drops.index')->with('error', ['title' => 'Erreur', 'message' => 'Aucun compte ne possède ce gain']);
+        }
+        
+        $compte = Account::find($availableAccounts[0]['account_id']);
+        $dropper = User::find($availableAccounts[0]['author']);
+
+        AccountUse::create([
+            'account_id' => $compte->id,
+            'user_id' => Auth::user()->id,
+            'reward' => 'CR' . $rewardPoints,
+            'used_at' => Carbon::now(),
+        ]);
 
         return redirect()->route('drops.index', [
             'qrcode' => $compte->qr_code,
-            'reward' => $reward,
-            'dropper' => $user->name
+            'reward' => $rewardPoints,
+            'dropper' => $dropper->name
         ])->with('success', ['title' => 'Succès', 'message' => 'Le gain a bien été récupéré']);
     }
 }
