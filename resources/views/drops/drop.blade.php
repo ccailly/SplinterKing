@@ -187,76 +187,89 @@
                     <div class="mt-6 space-y-8 xl:mt-12">
                         <div class="form-control">
                             <div class="flex flex-row items-center justify-center w-full mx-auto">
-
                                 <div class="flex flex-col items-center justify-center w-full mx-auto mt-24">
-
+                                    @if (!in_array($reward->points, [30, 80, 120, 140, 180, 220]))
+                                        @php
+                                            $nextLevelPoints = collect([0, 30, 80, 120, 140, 180, 220])
+                                                ->filter(function ($level) use ($reward) {
+                                                    return $level < $reward->points;
+                                                })
+                                                ->last();
+                                            //dd($nextLevelPoints);
+                                        @endphp
+                                        @if ($nextLevelPoints == 0)
+                                        @break
+                                    @else
+                                        <x-palier :points="$nextLevelPoints" />
+                                    @endif
+                                @else
                                     <x-palier :points="$reward->points" />
+                                @endif
 
 
 
-
-                                    <div class="w-56 -mt-10 overflow-hidden bg-white rounded-lg shadow-lg md:w-80">
-                                        <h3
-                                            class="flex flex-row items-center justify-center py-2 font-bold tracking-wide text-center text-gray-800 uppercase font-flame">
-                                            {{ $reward->points }}
-                                            <svg width="35" height="35" fill="#F7A800" class="pb-1"
-                                                viewBox="0 0 24 24" preserveAspectRatio="none">
-                                                <path
-                                                    d="M12.34 15.874c4.993 0 8.375 1.167 8.965 2.106-.94 1.28-4.59 2.22-8.964 2.22-4.375 0-8.053-.94-8.965-2.22.59-.939 3.945-2.106 8.965-2.106zM12.26 4.15c.134-.199.403-.199.537 0l3.704 6.347c.107.17.322.227.483.085l4.026-3.586c.188-.199.51-.028.51.256v9.534c-1.637-1.366-5.368-2.05-9.206-2.05-3.704 0-7.596.77-9.314 2.05V7.25c0-.284.295-.455.51-.284l4.402 3.728c.134.114.349.085.456-.086l3.892-6.46z"
-                                                    fill-rule="evenodd"></path>
-                                            </svg>
-                                        </h3>
-                                        <div class="flex items-center justify-between px-3 py-2 bg-gray-200">
-                                            <span
-                                                class="flex flex-row items-center font-bold text-gray-800">{{ $reward->total }}
-                                                @if ($reward->total > 1)
-                                                    Disponibles
-                                                @else
-                                                    Disponible
-                                                @endif
-                                            </span>
-                                            <form action="{{ route('drops.getReward') }}" method="POST">
-                                                @csrf
-                                                <input type="number" name="reward" class="hidden"
-                                                    value="{{ $reward->points }}">
-                                                <button
-                                                    class="px-2 py-1 text-xs font-semibold text-white uppercase transition-colors duration-300 transform bg-gray-800 rounded hover:bg-gray-700 focus:bg-gray-700 focus:outline-none">Récuperer</button>
-                                            </form>
-                                        </div>
+                                <div class="w-56 -mt-10 overflow-hidden bg-white rounded-lg shadow-lg md:w-80">
+                                    <h3
+                                        class="flex flex-row items-center justify-center py-2 font-bold tracking-wide text-center text-gray-800 uppercase font-flame">
+                                        {{ $reward->points }}
+                                        <svg width="35" height="35" fill="#F7A800" class="pb-1"
+                                            viewBox="0 0 24 24" preserveAspectRatio="none">
+                                            <path
+                                                d="M12.34 15.874c4.993 0 8.375 1.167 8.965 2.106-.94 1.28-4.59 2.22-8.964 2.22-4.375 0-8.053-.94-8.965-2.22.59-.939 3.945-2.106 8.965-2.106zM12.26 4.15c.134-.199.403-.199.537 0l3.704 6.347c.107.17.322.227.483.085l4.026-3.586c.188-.199.51-.028.51.256v9.534c-1.637-1.366-5.368-2.05-9.206-2.05-3.704 0-7.596.77-9.314 2.05V7.25c0-.284.295-.455.51-.284l4.402 3.728c.134.114.349.085.456-.086l3.892-6.46z"
+                                                fill-rule="evenodd"></path>
+                                        </svg>
+                                    </h3>
+                                    <div class="flex items-center justify-between px-3 py-2 bg-gray-200">
+                                        <span
+                                            class="flex flex-row items-center font-bold text-gray-800">{{ $reward->total }}
+                                            @if ($reward->total > 1)
+                                                Disponibles
+                                            @else
+                                                Disponible
+                                            @endif
+                                        </span>
+                                        <form action="{{ route('drops.getReward') }}" method="POST">
+                                            @csrf
+                                            <input type="number" name="reward" class="hidden"
+                                                value="{{ $reward->points }}">
+                                            <button
+                                                class="px-2 py-1 text-xs font-semibold text-white uppercase transition-colors duration-300 transform bg-gray-800 rounded hover:bg-gray-700 focus:bg-gray-700 focus:outline-none">Récuperer</button>
+                                        </form>
                                     </div>
-
-
                                 </div>
+
 
                             </div>
 
                         </div>
 
                     </div>
-                @endforeach
 
-            </div>
+                </div>
+            @endforeach
 
         </div>
 
     </div>
 
-    <script>
-        $('#switchButton').click(function() {
-            if ($('.qrcode').hasClass('hidden')) {
-                $('#switchButton').text('Voir le code');
-                $('.qrcode').removeClass('hidden');
-                $('.code').addClass('hidden');
-            } else {
-                $('#switchButton').text('Voir le QR Code');
-                $('.qrcode').addClass('hidden');
-                $('.code').removeClass('hidden');
-            }
+</div>
 
-        });
-    </script>
+<script>
+    $('#switchButton').click(function() {
+        if ($('.qrcode').hasClass('hidden')) {
+            $('#switchButton').text('Voir le code');
+            $('.qrcode').removeClass('hidden');
+            $('.code').addClass('hidden');
+        } else {
+            $('#switchButton').text('Voir le QR Code');
+            $('.qrcode').addClass('hidden');
+            $('.code').removeClass('hidden');
+        }
 
-    {{-- <div class="flex flex-row items-center justify-center w-full mx-auto">
+    });
+</script>
+
+{{-- <div class="flex flex-row items-center justify-center w-full mx-auto">
 
             <div class="flex flex-col items-center justify-center w-full mx-auto mt-24">
 
