@@ -176,7 +176,7 @@ class DropController extends Controller
             ->toArray();
 
         $availableAccounts = [];
-        
+
         foreach ($wheels as $wheel) {
             $accountId = $wheel['account_id'];
             $points = $wheel['points'];
@@ -186,7 +186,7 @@ class DropController extends Controller
             $available = true;
 
             foreach ($accountUses as $accountUse) {
-                if ($accountUse['account_id'] === $accountId && $accountUse['max_date'] > $maxDate){
+                if ($accountUse['account_id'] === $accountId && $accountUse['max_date'] > $maxDate) {
                     $maxDate = $accountUse['max_date'];
                     $available = false;
                     break;
@@ -221,7 +221,7 @@ class DropController extends Controller
         if (count($availableAccounts) === 0) {
             return redirect()->route('drops.index')->with('error', ['title' => 'Erreur', 'message' => 'Aucun compte ne possède ce gain']);
         }
-        
+
         $compte = Account::find($availableAccounts[0]['account_id']);
         $dropper = User::find($availableAccounts[0]['author']);
 
@@ -237,5 +237,28 @@ class DropController extends Controller
             'reward' => $rewardPoints,
             'dropper' => $dropper->name
         ])->with('success', ['title' => 'Succès', 'message' => 'Le gain a bien été récupéré']);
+    }
+
+    public function showMyDrops()
+    {
+
+        $myDrops = AccountUse::select(DB::raw('CONVERT(SUBSTRING_INDEX(account_uses.reward, "CR", -1), SIGNED) as points'), DB::raw('MAX(account_uses.used_at) as date'), 'accounts.qr_code')
+            ->join('accounts', 'account_uses.account_id', '=', 'accounts.id')
+            ->where('account_uses.used_at', '>', Carbon::now()->subDays(1))
+            ->where('account_uses.user_id', '=', Auth::user()->id)
+            ->groupBy('points', 'qr_code', 'account_uses.used_at')
+            ->orderBy('account_uses.used_at', 'desc')
+            ->get();
+
+            $totalDrops = AccountUse::select(DB::raw('COUNT(*) as total'))
+            ->where('account_uses.user_id', '=', Auth::user()->id)
+            ->get();
+
+
+        return view('drops.mydrops', [
+            'myDrops' => $myDrops,
+            'totalDrops' => $totalDrops->first()->total,
+        ]);
+
     }
 }

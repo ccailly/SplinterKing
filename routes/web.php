@@ -27,6 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', [DropController::class, 'showCrowns'])->name('drops.index');
         Route::get('/crowns', [DropController::class, 'showCrowns'])->name('drops.crowns');
         Route::get('/coupons', [DropController::class, 'showCoupons'])->name('drops.coupons');
+        Route::get('/my-drops', [DropController::class, 'showMyDrops'])->name('drops.myDrops');
         Route::post('/getReward', [DropController::class, 'getReward'])->name('drops.getReward');
     });
 

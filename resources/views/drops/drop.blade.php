@@ -2,6 +2,23 @@
 
     <div class="flex flex-col items-center justify-center w-full mx-auto py-24 gap-12">
 
+        <div class="flex items-center justify-center">
+            <div class="inline-flex bg-white border divide-x rounded-lg  rtl:flex-row-reverse  ">
+                <a href="{{ route('drops.crowns') }}"
+                    class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 @if (Route::currentRouteName() == 'drops.crowns' || Route::currentRouteName() == 'drops.index') bg-gray-100 @endif sm:text-sm hover:bg-gray-100">
+                    Couronnes
+                </a>
+                <a href="{{ route('drops.coupons') }}"
+                    class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 @if (Route::currentRouteName() == 'drops.coupons') bg-gray-100 @endif sm:text-sm hover:bg-gray-100">
+                    Coupons
+                </a>
+                <a href="{{ route('drops.myDrops') }}"
+                    class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 @if (Route::currentRouteName() == 'drops.myDrops') bg-gray-100 @endif sm:text-sm hover:bg-gray-100">
+                    Mes drops
+                </a>
+            </div>
+        </div>
+
         @if (Request::get('qrcode'))
             <div x-data="{ isOpen: true }" class="relative flex justify-center">
                 <button @click="isOpen = true"
@@ -47,9 +64,11 @@
                                 </div>
                             </div>
                             <div class="flex flex-row justify-center items-center mt-3 text-center sm:mt-5 gap-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-lime-600">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                  </svg>                                  
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-lime-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
                                 <h1 class="text-lg leading-6 text-gray-900" id="modal-title">
                                     Dit merci à
                                 </h1>
@@ -129,19 +148,6 @@
                         <p class="text-gray-600">fois</p>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="flex items-center justify-center">
-            <div class="inline-flex bg-white border divide-x rounded-lg  rtl:flex-row-reverse  ">
-                <a href="{{ route('drops.crowns') }}"
-                    class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 @if (Route::currentRouteName() != 'drops.coupons') bg-gray-100 @endif sm:text-sm hover:bg-gray-100">
-                    Couronnes
-                </a>
-                <a href="{{ route('drops.coupons') }}"
-                    class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 @if (Route::currentRouteName() == 'drops.coupons') bg-gray-100 @endif sm:text-sm hover:bg-gray-100">
-                    Coupons
-                </a>
             </div>
         </div>
 
