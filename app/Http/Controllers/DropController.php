@@ -280,8 +280,8 @@ class DropController extends Controller
         $compte = Account::find($availableAccounts[0]['account_id']);
         $dropper = User::find($availableAccounts[0]['author']);
 
-        if ($dropper == null) {
-            $dropper = 'Maitre Splinter';
+        if ($dropper->name == null) {
+            $dropper->name = 'Maitre Splinter';
         }
         
 
