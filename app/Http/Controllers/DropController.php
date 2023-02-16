@@ -278,7 +278,7 @@ class DropController extends Controller
         }
 
         $compte = Account::find($availableAccounts[0]['account_id']);
-        $dropper = User::find($availableAccounts[0]['author'])->name;
+        $dropper = User::find($availableAccounts[0]['author']);
 
         if ($dropper == null) {
             $dropper = 'Maitre Splinter';
@@ -295,7 +295,7 @@ class DropController extends Controller
         return redirect()->route('drops.index', [
             'qrcode' => $compte->qr_code,
             'reward' => $rewardPoints,
-            'dropper' => $dropper
+            'dropper' => $dropper->name,
         ])->with('success', ['title' => 'Succès', 'message' => 'Le gain a bien été récupéré']);
     }
 
