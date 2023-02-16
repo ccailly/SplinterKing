@@ -224,46 +224,7 @@ class DropController extends Controller
             ->orderBy('snapshots.account_id', 'asc')
             ->get()
             ->toArray();
-
-
-        // foreach ($wheels as $wheel) {
-        //     $accountId = $wheel['account_id'];
-        //     $points = $wheel['points'];
-        //     $maxDate = $wheel['max_date'];
-        //     $author = $wheel['author'];
-
-        //     $available = true;
-
-        //     foreach ($accountUses as $accountUse) {
-        //         if ($accountUse['account_id'] === $accountId && $accountUse['max_date'] > $maxDate) {
-        //             $maxDate = $accountUse['max_date'];
-        //             $available = false;
-        //             break;
-        //         }
-        //     }
-
-        //     foreach ($snapshots as $snapshot) {
-        //         if ($snapshot['account_id'] === $accountId && $snapshot['max_date'] > $maxDate) {
-        //             $available = false;
-        //             $availableAccounts[] = [
-        //                 'account_id' => $accountId,
-        //                 'points' => $snapshot['points'],
-        //                 'max_date' => $snapshot['max_date'],
-        //                 'author' => $snapshot['author'],
-        //             ];
-        //             break;
-        //         }
-        //     }
-
-        //     if ($available) {
-        //         $availableAccounts[] = [
-        //             'account_id' => $accountId,
-        //             'points' => $points,
-        //             'max_date' => $maxDate,
-        //             'author' => $author,
-        //         ];
-        //     }
-        // }
+       
 
         foreach ($wheels as $wheel) {
             $accountId = $wheel['account_id'];

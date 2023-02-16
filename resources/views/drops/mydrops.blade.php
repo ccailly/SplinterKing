@@ -44,10 +44,17 @@
         <div class="grid grid-cols-1 gap-8 mt-8 xl:mt-16 md:grid-cols-2 xl:grid-cols-3">
 
             @foreach ($myDrops as $drop)
-                <div class="w-full max-w-xs overflow-hidden bg-white rounded-lg shadow-lg">
-                    <img class="qrcode object-cover w-auto h-auto rounded-md transition-all duration-300 transform"
-                        src="http://chart.googleapis.com/chart?cht=qr&chl={{ $drop->qr_code }}&choe=UTF-8&chs=400x400&chld=M|2"
-                        alt="">
+                <div class="w-full max-w-xs overflow-hidden bg-white rounded-xl shadow-xl">
+
+                    <div class="relative flex flex-col justify-center items-center py-5 text-center">
+                        <img class="qrcode object-cover w-auto h-auto rounded-md z-10 transition-all duration-300 transform"
+                            src="http://chart.googleapis.com/chart?cht=qr&chl={{ $drop->qr_code }}&choe=UTF-8&chs=400x400&chld=M|2"
+                            alt="">
+                        <h3 class="absolute code text-center text-3xl py-36 mx-24 font-extrabold leading-6 z-0 text-gray-900 transition-all duration-300 transform opacity-0 scale-0"
+                            id="modal-title">
+                            {{ $drop->qr_code }}
+                        </h3>
+                    </div>
 
                     <div class="flex flex-col justify-center items-center py-5 text-center">
                         <div class="flex flex-row justify-center items-center gap-1">
@@ -70,5 +77,22 @@
         </div>
 
     </div>
+
+    <script>
+        $(document).ready(function() {
+            $('.qrcode').click(function() {
+                $(this).next().toggleClass('opacity-0');
+                $(this).next().toggleClass('scale-0');
+                $(this).toggleClass('opacity-0');
+                $(this).toggleClass('scale-0');
+            });
+            $('.code').click(function() {
+                $(this).prev().toggleClass('opacity-0');
+                $(this).prev().toggleClass('scale-0');
+                $(this).toggleClass('opacity-0');
+                $(this).toggleClass('scale-0');
+            });
+        });
+    </script>
 
 </x-app-layout>
