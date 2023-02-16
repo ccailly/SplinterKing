@@ -12,6 +12,7 @@ use App\Models\Coupon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Exception;
 
 class DropController extends Controller
 {
@@ -23,8 +24,8 @@ class DropController extends Controller
         $totalPreferedReward = $preferedReward != 'Aucune' ? AccountUse::where('reward', $preferedReward->reward)->count() : 0;
 
 
-        $accountUses = AccountUse::select('account_uses.account_id', DB::raw('CONVERT(SUBSTRING_INDEX(account_uses.reward, "CR", -1), SIGNED) as points'), DB::raw('MAX(account_uses.used_at) as max_date'))
-            ->groupBy('account_uses.account_id', 'points')
+        $accountUses = AccountUse::select('account_uses.account_id', DB::raw('MAX(account_uses.used_at) as max_date'))
+            ->groupBy('account_uses.account_id')
             ->orderBy('account_uses.account_id', 'asc')
             ->get()
             ->toArray();
@@ -68,7 +69,7 @@ class DropController extends Controller
             $addReward = true;
 
             foreach ($accountUses as $accountUse) {
-                if ($accountUse['account_id'] === $accountId && $accountUse['points'] === $points && $accountUse['max_date'] > $maxDate) {
+                if ($accountUse['account_id'] === $accountId && $accountUse['max_date'] > $maxDate) {
                     $maxDateAccountUse = $accountUse['max_date'];
                     $addReward = false;
                     break;
@@ -163,6 +164,7 @@ class DropController extends Controller
 
         $coupons = Coupon::select('coupons.label', DB::raw('count(*) as total'), DB::raw('DATEDIFF(MAX(coupons.ending_at), NOW()) as remaining_days'))
             ->join('snapshots', 'coupons.snapshot_id', '=', 'snapshots.id')
+            //->join('account_uses', 'snapshots.account_id', '=', 'account_uses.account_id')
             ->where('coupons.ending_at', '>', Carbon::now())
             ->groupBy('coupons.label')
             ->get();
@@ -173,7 +175,7 @@ class DropController extends Controller
         ]);
     }
 
-    public function getReward(Request $request)
+    public function claimReward(Request $request)
     {
         try {
             $request->validate([
@@ -187,9 +189,9 @@ class DropController extends Controller
 
         $availableAccounts = [];
 
-        $accountUses = AccountUse::select('account_uses.account_id', DB::raw('CONVERT(SUBSTRING_INDEX(account_uses.reward, "CR", -1), SIGNED) as points'), DB::raw('MAX(account_uses.used_at) as max_date'), DB::raw('user_id as author'))
+        $accountUses = AccountUse::select('account_uses.account_id', DB::raw('MAX(account_uses.used_at) as max_date'), DB::raw('user_id as author'))
             ->where('account_uses.reward', 'like', '%CR' . $rewardPoints)
-            ->groupBy('account_uses.account_id', 'points', 'author')
+            ->groupBy('account_uses.account_id', 'author')
             ->orderBy('account_uses.account_id', 'asc')
             ->get()
             ->toArray();
@@ -236,7 +238,7 @@ class DropController extends Controller
             $addReward = true;
 
             foreach ($accountUses as $accountUse) {
-                if ($accountUse['account_id'] === $accountId && $accountUse['points'] === $points && $accountUse['max_date'] > $maxDate) {
+                if ($accountUse['account_id'] === $accountId && $accountUse['max_date'] > $maxDate) {
                     $maxDateAccountUse = $accountUse['max_date'];
                     $addReward = false;
                     break;
@@ -270,14 +272,18 @@ class DropController extends Controller
             ];
         }
 
-        //dd($availableAccounts);
 
         if (count($availableAccounts) === 0) {
             return redirect()->route('drops.index')->with('error', ['title' => 'Erreur', 'message' => 'Aucun compte ne possède ce gain']);
         }
 
         $compte = Account::find($availableAccounts[0]['account_id']);
-        $dropper = User::find($availableAccounts[0]['author']);
+        $dropper = User::find($availableAccounts[0]['author'])->name;
+
+        if ($dropper == null) {
+            $dropper = 'Maitre Splinter';
+        }
+        
 
         AccountUse::create([
             'account_id' => $compte->id,
@@ -289,14 +295,55 @@ class DropController extends Controller
         return redirect()->route('drops.index', [
             'qrcode' => $compte->qr_code,
             'reward' => $rewardPoints,
-            'dropper' => $dropper->name
+            'dropper' => $dropper
         ])->with('success', ['title' => 'Succès', 'message' => 'Le gain a bien été récupéré']);
+    }
+
+    public function claimCoupon(Request $request){
+
+        try{
+            $this->validate($request, [
+                'coupon' => 'required|exists:coupons,label',
+            ]) ;  
+        } catch (Exception $e) {
+            return redirect()->route('drops.coupons')->with('error', ['title' => 'Erreur', 'message' => 'Le coupon n\'existe pas']);
+        }
+
+        $coupon = Coupon::where('label', $request->input('coupon'))
+        ->where('ending_at', '>', Carbon::now())
+        ->first();
+
+        if($coupon->ending_at < Carbon::now()){
+            return redirect()->route('drops.coupons')->with('error', ['title' => 'Erreur', 'message' => 'Le coupon est expiré']);
+        }
+
+        $accountId = Snapshot::where('snapshots.id', $coupon->snapshot_id)->pluck('account_id')->first();
+
+        if($accountId == null){
+            return redirect()->route('drops.coupons')->with('error', ['title' => 'Erreur', 'message' => 'Le coupon n\'est pas encore disponible']);
+        }
+
+        $compte = Account::find($accountId);
+
+        AccountUse::create([
+            'account_id' => $compte->id,
+            'user_id' => Auth::user()->id,
+            'reward' => $coupon->label,
+            'used_at' => Carbon::now(),
+        ]);
+
+        return redirect()->route('drops.coupons', [
+            'qrcode' => $compte->qr_code,
+            'reward' => $coupon->label,
+        ])->with('success', ['title' => 'Succès', 'message' => 'Le coupon a bien été récupéré']);
+
+
     }
 
     public function showMyDrops()
     {
 
-        $myDrops = AccountUse::select(DB::raw('CONVERT(SUBSTRING_INDEX(account_uses.reward, "CR", -1), SIGNED) as points'), DB::raw('MAX(account_uses.used_at) as date'), 'accounts.qr_code')
+        $myDrops = AccountUse::select(DB::raw("IF(account_uses.reward LIKE 'CR%', CONVERT(SUBSTRING_INDEX(account_uses.reward, 'CR', -1), SIGNED), account_uses.reward) as points"), DB::raw('MAX(account_uses.used_at) as date'), 'accounts.qr_code')
             ->join('accounts', 'account_uses.account_id', '=', 'accounts.id')
             ->where('account_uses.used_at', '>', Carbon::now()->subDays(1))
             ->where('account_uses.user_id', '=', Auth::user()->id)

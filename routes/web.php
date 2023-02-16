@@ -28,7 +28,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/crowns', [DropController::class, 'showCrowns'])->name('drops.crowns');
         Route::get('/coupons', [DropController::class, 'showCoupons'])->name('drops.coupons');
         Route::get('/my-drops', [DropController::class, 'showMyDrops'])->name('drops.myDrops');
-        Route::post('/getReward', [DropController::class, 'getReward'])->name('drops.getReward');
+        Route::post('/getReward', [DropController::class, 'claimReward'])->name('drops.getReward');
+        Route::post('/getCoupon', [DropController::class, 'claimCoupon'])->name('drops.getCoupon');
     });
 
     Route::prefix('/ranking')->group(function () {
