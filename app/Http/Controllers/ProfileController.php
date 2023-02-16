@@ -57,4 +57,21 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    public function showToken(Request $request, $plainTokenText = null)
+    {
+        $token = $request->user()->tokens()->first();
+
+        return view('profile.token', [
+            'token' => $token,
+            'plainTokenText' => $plainTokenText,
+        ]);
+    }
+
+    public function generateToken(Request $request)
+    {
+        $token = $request->user()->createToken($request->user()->email . ' token-' . now()->timestamp);
+
+        return $this->showToken($request, $token->plainTextToken);
+    }
 }

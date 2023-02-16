@@ -6,6 +6,7 @@ use App\Http\Controllers\SnapshotsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DropController;
 use App\Http\Controllers\RankingController;
+use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -62,6 +63,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::group(['prefix' => 'profile'], function () {
+        Route::get('/token', [ProfileController::class, 'showToken'])->name('profile.token');
+        Route::get('/token/generate', [ProfileController::class, 'generateToken'])->name('profile.token.generate');
+    });
 });
 
 require __DIR__ . '/auth.php';
