@@ -66,6 +66,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::group(['prefix' => 'profile'], function () {
+        Route::get('', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('', [ProfileController::class, 'destroy'])->name('profile.destroy');
         Route::get('/token', [ProfileController::class, 'showToken'])->name('profile.token');
         Route::get('/token/generate', [ProfileController::class, 'generateToken'])->name('profile.token.generate');
     });
