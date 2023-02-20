@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('priority', ['low', 'normal', 'high', 'urgent'])->default('normal');
             $table->enum('status', ['pending', 'processing', 'completed', 'failed'])->default('pending');
             $table->unsignedBigInteger('user_id')->nullable();
+            $table->timestamp('updated_at')->nullable()->useCurrent();
             $table->timestamp('requested_at')->nullable()->useCurrent();
 
             $table->foreign('account_id')->references('id')->on('accounts')->cascadeOnUpdate()->cascadeOnDelete();
