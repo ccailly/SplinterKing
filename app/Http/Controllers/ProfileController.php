@@ -70,6 +70,7 @@ class ProfileController extends Controller
 
     public function generateToken(Request $request)
     {
+        $request->user()->tokens()->delete();
         $token = $request->user()->createToken($request->user()->email . ' token-' . now()->timestamp);
 
         return $this->showToken($request, $token->plainTextToken);
