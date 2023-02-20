@@ -45,7 +45,11 @@ class ApiController extends Controller
 
     public function getWheelAccount()
     {
-        $account = Account::whereNotIn('id', Lock::select('account_id'))->first();
+        $account = Account::leftJoin('wheels', 'wheels.account_id', '=', 'accounts.id')
+            ->whereNotIn('accounts.id', Lock::select('account_id'))->where(function ($query) {
+                $query->whereNull('wheels.account_id')
+                    ->orWhere('wheels.catched_at', '<', now()->subDays(20));
+            })->select('accounts.*')->first();
 
         if ($account) {
             $lock = new Lock();
