@@ -47,6 +47,7 @@ class RunSnapshot extends Command
 
         // Switch the status to processing
         $snapshotRequest->status = 'processing';
+        $snapshotRequest->updated_at = Carbon::now();
         $snapshotRequest->save();
         $this->info('✅ Snapshot request status switched to processing');
 
@@ -72,6 +73,7 @@ class RunSnapshot extends Command
 
             // Switch the status to failed
             $snapshotRequest->status = 'failed';
+            $snapshotRequest->updated_at = Carbon::now();
             $snapshotRequest->save();
             $this->info('☑️ Snapshot request status switched to failed');
 
@@ -119,6 +121,7 @@ class RunSnapshot extends Command
 
         // Switch the status to completed
         $snapshotRequest->status = 'completed';
+        $snapshotRequest->updated_at = Carbon::now();
         $snapshotRequest->save();
         $this->info('✅ Snapshot request status switched to completed');
 
