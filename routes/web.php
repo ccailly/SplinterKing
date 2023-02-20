@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SnapshotsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DropController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\ApiController;
+use App\Http\Middleware\UserIsAdmin;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -71,6 +73,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('', [ProfileController::class, 'destroy'])->name('profile.destroy');
         Route::get('/token', [ProfileController::class, 'showToken'])->name('profile.token');
         Route::get('/token/generate', [ProfileController::class, 'generateToken'])->name('profile.token.generate');
+    });
+
+    // Route middleware, allow if user is admin
+    Route::middleware([UserIsAdmin::class])->group(function () {
+        Route::get('/admin/register-user', [AdminController::class, 'registerUser'])->name('admin.registerUser');
+        Route::post('/admin/register-user', [AdminController::class, 'storeUser'])->name('admin.storeUser');
     });
 });
 

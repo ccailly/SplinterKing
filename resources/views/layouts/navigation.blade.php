@@ -64,7 +64,7 @@
                         </svg>
                     </button>
 
-                    <div x-data="{ isOpen: false }" class="relative inline-block ">
+                    <div x-data="{ isOpen: false }" class="relative inline-block w-full">
                         <!-- Dropdown toggle button -->
                         <button type="button" @click="isOpen = !isOpen" class="flex items-center focus:outline-none"
                             aria-label="toggle profile dropdown">
@@ -84,7 +84,7 @@
                             x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
                             x-transition:leave="transition ease-in duration-100"
                             x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90"
-                            class="absolute right-0 z-20 w-48 py-2 mt-2 origin-top-right bg-white rounded-md shadow-xl ">
+                            class="absolute left-0 lg:right-0 lg:left-auto z-20 w-48 py-2 mt-2 origin-top-left lg:origin-top-right bg-white rounded-md shadow-xl ">
                             <a href="{{ route('profile.edit') }}"
                                 class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform  hover:bg-gray-100  ">
                                 profile
@@ -95,10 +95,12 @@
                                 api keys
                             </a>
 
-                            <a href="#"
-                                class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform  hover:bg-gray-100  ">
-                                paramètres
-                            </a>
+                            @if (Auth::user()->is_admin)
+                                <a href="{{ route('admin.registerUser') }}"
+                                    class="block px-4 py-3 text-sm text-gray-600 capitalize transition-colors duration-300 transform  hover:bg-gray-100  ">
+                                    Ajouter un utilisateur
+                                </a>
+                            @endif
 
                             <hr class="border-gray-200  ">
 
