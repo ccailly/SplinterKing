@@ -15,7 +15,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('snapshot:run')->everyFiveMinutes();
+        // $schedule->command('snapshot:run')->everyFiveMinutes();
         $schedule->command('snapshot:checkaccounts')->daily();
         $schedule->command('lock:clear')->hourly();
     }
