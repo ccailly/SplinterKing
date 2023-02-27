@@ -40,7 +40,7 @@
                             aria-hidden="true">&#8203;</span>
 
                         <div
-                            class="inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-2xl shadow-black sm:my-8 sm:align-middle sm:max-w-md sm:w-full sm:p-6">
+                            class="inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-2xl shadow- sm:my-8 sm:align-middle sm:max-w-md sm:w-full sm:p-6">
                             <div class="relative flex flex-col justify-center items-center text-center">
                                 <img class="qrcode object-cover w-auto h-auto rounded-md transition-all duration-300 transform"
                                     src="http://chart.googleapis.com/chart?cht=qr&chl={{ Request::get('qrcode') }}&choe=UTF-8&chs=400x400&chld=M|2"
