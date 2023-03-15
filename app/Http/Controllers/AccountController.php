@@ -155,7 +155,8 @@ class AccountController extends Controller
         $rows_per_page = 30.0;
 
         $wheels = Wheel::where('account_id', $id)
-            ->select('reward', 'user_id', 'catched_at')
+            ->leftJoin('users', 'users.id', '=', 'wheels.user_id')
+            ->select('reward', 'name', 'catched_at')
             ->orderBy('catched_at', 'desc');
         if ($tab == 'Roulette') {
             $wheels->where('reward', 'like', '%' . $search . '%')
@@ -178,10 +179,11 @@ class AccountController extends Controller
 
         $snapshots = SnapshotRequest::leftjoin('snapshots', 'snapshots.snapshot_request_id', '=', 'snapshot_requests.id')
             ->leftjoin('coupons', 'coupons.snapshot_id', '=', 'snapshots.id')
+            ->leftJoin('users', 'users.id', '=', 'snapshots.user_id')
             ->where('snapshot_requests.account_id', $id)
             ->whereIn('snapshot_requests.status', ['completed', 'failed'])
-            ->select('snapshot_requests.status', DB::raw('IFNULL(points, 0)'), DB::raw('count(coupons.snapshot_id) as nb_coupons'), 'snapshot_requests.user_id', DB::raw('IFNULL(captured_at, requested_at) as captured_at'))
-            ->groupBy('snapshots.id', 'snapshots.points', 'snapshots.captured_at', 'snapshot_requests.account_id', 'snapshot_requests.user_id', 'snapshot_requests.status', 'snapshot_requests.requested_at')
+            ->select('snapshot_requests.status', DB::raw('IFNULL(points, 0)'), DB::raw('count(coupons.snapshot_id) as nb_coupons'), DB::raw('IFNULL(users.name, "N/A") as name'), DB::raw('IFNULL(captured_at, requested_at) as captured_at'))
+            ->groupBy('snapshots.id', 'snapshots.points', 'snapshots.captured_at', 'snapshot_requests.account_id', 'snapshot_requests.status', 'snapshot_requests.requested_at', 'name')
             ->orderBy('captured_at', 'desc');
 
         if ($tab == 'Snapshots' && $search != '') {
@@ -193,7 +195,8 @@ class AccountController extends Controller
         $rowsSnapshots = $snapshots->skip(($page - 1) * $rows_per_page)->take($rows_per_page)->get()->toArray();
 
         $requestedSnapshots = SnapshotRequest::where('account_id', $id)
-            ->select('priority', 'status', 'user_id', 'requested_at')
+        ->leftJoin('users', 'users.id', '=', 'snapshot_requests.user_id')
+            ->select('priority', 'status', DB::raw('IFNULL(users.name, "N/A") as name'), 'requested_at')
             ->whereIn('status', ['pending', 'processing'])
             ->orderByDesc('priority');
         $totalRequestedSnapshots = $requestedSnapshots->get()->count();

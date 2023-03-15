@@ -17,7 +17,15 @@ class SnapshotsController extends Controller
         $snapshots_request_per_page = 30.0;
         $snapshots_request = SnapshotRequest::leftJoin('accounts', 'accounts.id', '=', 'snapshot_requests.account_id')
             ->leftJoin('users', 'users.id', '=', 'snapshot_requests.user_id')
-            ->select('snapshot_requests.id', 'accounts.mail', 'priority', 'status', 'users.name', 'requested_at')
+            ->select(
+                DB::raw('snapshot_requests.id as snapshot_request_id'),
+                DB::raw('accounts.id as account_id'),
+                'accounts.mail',
+                'priority',
+                'status',
+                DB::raw('IFNULL(users.name, "N/A") as user_name'),
+                'requested_at'
+            )
             ->whereIn('status', ['pending', 'processing'])
             ->orderByDesc('priority');
         $total_snapshots_request = $snapshots_request->get()->count();
@@ -25,16 +33,18 @@ class SnapshotsController extends Controller
             ->take($snapshots_request_per_page)->get()->toArray();
 
         foreach ($rows_snapshots_request as $key => $row) {
+            $rows_snapshots_request[$key]['mail'] = '<a href="' . route('accounts.show', ['account' => $row['account_id'], 'tab' => 'Informations']) . '">' . $row['mail'] . '</a>';
             $rows_snapshots_request[$key]['actions'] = [
                 'Modifier' => [
-                    'url' => route('snapshots.requests.show', ['snapshot_request_id' => $row['id']]),
+                    'url' => route('snapshots.requests.show', ['snapshot_request_id' => $row['snapshot_request_id']]),
                 ],
                 'Supprimer' => [
-                    'url' => route('snapshots.requests.show', ['snapshot_request_id' => $row['id'], 'delete' => true]),
+                    'url' => route('snapshots.requests.show', ['snapshot_request_id' => $row['snapshot_request_id'], 'delete' => true]),
                 ],
             ];
 
-            unset($rows_snapshots_request[$key]['id']);
+            unset($rows_snapshots_request[$key]['snapshot_request_id']);
+            unset($rows_snapshots_request[$key]['account_id']);
         }
 
         $snapshots_page = $request->query('snapshots_page', 1);
@@ -53,13 +63,19 @@ class SnapshotsController extends Controller
                     ->orWhere('snapshots.points', 'like', '%' . $snapshots_search . '%')
                     ->orWhere('snapshots.captured_at', 'like', '%' . $snapshots_search . '%');
             })
-            ->select('accounts.mail', 'users.name', 'snapshot_requests.status', DB::raw('IFNULL(points, 0)'), DB::raw('count(coupons.snapshot_id) as nb_coupons'), DB::raw('IFNULL(captured_at, snapshot_requests.updated_at) as captured_at2'))
-            ->groupBy('snapshots.id', 'snapshots.points', 'snapshots.captured_at', 'accounts.mail', 'users.name', 'snapshot_requests.status', 'snapshot_requests.requested_at', 'snapshot_requests.updated_at')
+            ->select(DB::raw('accounts.id as account_id'), 'accounts.mail', 'users.name', 'snapshot_requests.status', DB::raw('IFNULL(points, 0)'), DB::raw('count(coupons.snapshot_id) as nb_coupons'), DB::raw('IFNULL(captured_at, snapshot_requests.updated_at) as captured_at2'))
+            ->groupBy('snapshots.id', 'accounts.id', 'snapshots.points', 'snapshots.captured_at', 'accounts.mail', 'users.name', 'snapshot_requests.status', 'snapshot_requests.requested_at', 'snapshot_requests.updated_at')
             ->orderByDesc($snapshots_sort);
 
         $total_snapshots = $snapshots->get()->count();
         $rows_snapshots = $snapshots->skip(($snapshots_page - 1) * $snapshots_per_page)
             ->take($snapshots_per_page)->get()->toArray();
+
+        foreach ($rows_snapshots as $key => $row) {
+            $rows_snapshots[$key]['mail'] = '<a href="' . route('accounts.show', ['account' => $row['account_id'], 'tab' => 'Informations']) . '">' . $row['mail'] . '</a>';
+            
+            unset($rows_snapshots[$key]['account_id']);
+        }
 
         return view('snapshots.shows', [
             'requestedSnapshots' => [

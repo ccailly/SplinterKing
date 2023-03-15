@@ -91,10 +91,12 @@
                                                     <div>
                                                         <h2
                                                             class="font-medium text-gray-800 overflow-auto">
-                                                            {{-- Si la data est supérieur à 60 caractères, appliqué un retour à la ligne à la fin de chaque phrase --}}
+                                                            {{-- Si la data est supérieur à 60 caractères et ne contient aucune balise html, appliqué un retour à la ligne à la fin de chaque phrase --}}
                                                             @if (strlen($data) > 60)
                                                                 @php
-                                                                    $data = wordwrap($data, 60, "<br>", true);
+                                                                    if (strip_tags($data) == $data) {
+                                                                        $data = wordwrap($data, 60, '<br>', true);
+                                                                    }
                                                                 @endphp
                                                             @endif
                                                             {!! $data !!}
