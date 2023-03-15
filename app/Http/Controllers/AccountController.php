@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Account;
 use App\Models\AccountUse;
 use App\Models\Wheel;
-use App\Models\Snapshot;
 use App\Models\Coupon;
 use App\Models\SnapshotRequest;
 use Illuminate\Http\Request;
@@ -24,11 +23,16 @@ class AccountController extends Controller
         $account_per_page = 30.0;
         $accounts = Account::leftJoin('snapshots', 'snapshots.account_id', '=', 'accounts.id')
             ->leftJoin('coupons', 'coupons.snapshot_id', '=', 'snapshots.id')
-            ->where('coupons.ending_at', '>', DB::raw('NOW()'))->orWhereNull('coupons.ending_at')
-            ->where('accounts.mail', 'like', '%' . $search . '%')
-            ->orWhere('accounts.qr_code', 'like', '%' . $search . '%')
-            ->orWhere('accounts.password', 'like', '%' . $search . '%')
-            ->orWhere('snapshots.points', 'like', '%' . $search . '%')
+            ->where(function ($query) {
+                $query->where('coupons.ending_at', '>', DB::raw('NOW()'))
+                    ->orWhereNull('coupons.ending_at');
+            })
+            ->where(function ($query) use ($search) {
+                $query->where('accounts.mail', 'like', '%' . $search . '%')
+                    ->orWhere('accounts.qr_code', 'like', '%' . $search . '%')
+                    ->orWhere('accounts.password', 'like', '%' . $search . '%')
+                    ->orWhere('snapshots.points', 'like', '%' . $search . '%');
+            })
             ->select('accounts.id', 'accounts.mail', 'password', 'qr_code', DB::raw('IFNULL(points, \'...\') as points'), DB::raw('count(coupons.id) as coupons'))
             ->groupBy('accounts.id', 'accounts.mail', 'password', 'qr_code', 'points', 'created_at')
             ->orderByDesc($sort);

@@ -46,10 +46,13 @@ class SnapshotsController extends Controller
             ->leftjoin('snapshots', 'snapshots.snapshot_request_id', '=', 'snapshot_requests.id')
             ->leftjoin('coupons', 'coupons.snapshot_id', '=', 'snapshots.id')
             ->whereIn('snapshot_requests.status', ['completed', 'failed'])
-            ->orWhere('snapshots.account_id', 'like', '%' . $snapshots_search . '%')
-            ->orWhere('snapshots.user_id', 'like', '%' . $snapshots_search . '%')
-            ->orWhere('snapshots.points', 'like', '%' . $snapshots_search . '%')
-            ->orWhere('snapshots.captured_at', 'like', '%' . $snapshots_search . '%')
+            ->where(function ($query) use ($snapshots_search) {
+                $query->where('accounts.mail', 'like', '%' . $snapshots_search . '%')
+                    ->orWhere('users.name', 'like', '%' . $snapshots_search . '%')
+                    ->orWhere('snapshot_requests.status', 'like', '%' . $snapshots_search . '%')
+                    ->orWhere('snapshots.points', 'like', '%' . $snapshots_search . '%')
+                    ->orWhere('snapshots.captured_at', 'like', '%' . $snapshots_search . '%');
+            })
             ->select('accounts.mail', 'users.name', 'snapshot_requests.status', DB::raw('IFNULL(points, 0)'), DB::raw('count(coupons.snapshot_id) as nb_coupons'), DB::raw('IFNULL(captured_at, snapshot_requests.updated_at) as captured_at2'))
             ->groupBy('snapshots.id', 'snapshots.points', 'snapshots.captured_at', 'accounts.mail', 'users.name', 'snapshot_requests.status', 'snapshot_requests.requested_at', 'snapshot_requests.updated_at')
             ->orderByDesc($snapshots_sort);
