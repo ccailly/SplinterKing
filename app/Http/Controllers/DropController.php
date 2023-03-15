@@ -164,7 +164,9 @@ class DropController extends Controller
 
         $coupons = Coupon::select('coupons.label', DB::raw('count(*) as total'), DB::raw('DATEDIFF(MAX(coupons.ending_at), NOW()) as remaining_days'))
             ->join('snapshots', 'coupons.snapshot_id', '=', 'snapshots.id')
-            //->join('account_uses', 'snapshots.account_id', '=', 'account_uses.account_id')
+            ->whereNotIn('snapshots.account_id', function($query) {
+                $query->select('account_uses.account_id')->from('account_uses');
+            })
             ->where('coupons.ending_at', '>', Carbon::now())
             ->groupBy('coupons.label')
             ->get();
