@@ -34,13 +34,31 @@ class RunSnapshot extends Command
      */
     public function handle()
     {
+        // Get the 5 last snapshot requests 
+        $snapshots = SnapshotRequest::where('updated_at', '!=', null)
+            ->orderByDesc('updated_at', 'desc')->take(5)->get();
+
+        // If the latest snapshot is less than 12 hours old and all snapshots are failed
+        if (
+            $snapshots->count() == 5 && Carbon::parse($snapshots->first()->captured_at)
+            ->diffInHours(Carbon::now()) < 12 && $snapshots->where('status', 'failed')->count() == 5
+        ) {
+            $this->info('⭕ Too many failed snapshots, waiting for 12 hours');
+            $this->info('⭕ Last snapshot captured at ' . $snapshots->first()->captured_at->format('d/m/Y H:i:s'));
+            $this->info('⭕ Next snapshot will be taken at ' . $snapshots->first()->captured_at->addHours(12)->format('d/m/Y H:i:s'));
+            return Command::FAILURE;
+        }
+
+        return Command::FAILURE;
+
+
         // Get the pending snapshot request with higher priority
         $snapshotRequest = SnapshotRequest::where('status', 'pending')->whereNotIn('account_id', Lock::select('account_id')->get()->pluck('account_id')->toArray())
             ->orderByDesc('priority')->first();
 
         if (!$snapshotRequest) {
             $this->info('⭕ No pending snapshot request found');
-            return Command::SUCCESS;
+            return Command::FAILURE;
         }
 
         $this->info('✅ Snapshot request found');
