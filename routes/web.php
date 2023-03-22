@@ -7,7 +7,7 @@ use App\Http\Controllers\SnapshotsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DropController;
 use App\Http\Controllers\RankingController;
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\BirthdaysController;
 use App\Http\Middleware\UserIsAdmin;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +33,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/my-drops', [DropController::class, 'showMyDrops'])->name('drops.myDrops');
         Route::post('/getReward', [DropController::class, 'claimReward'])->name('drops.getReward');
         Route::post('/getCoupon', [DropController::class, 'claimCoupon'])->name('drops.getCoupon');
+    });
+
+    Route::prefix('birthdays')->group(function () {
+        Route::get('/', [BirthdaysController::class, 'shows'])->name('birthdays.shows');
     });
 
     Route::prefix('/ranking')->group(function () {
