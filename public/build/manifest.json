@@ -1,0 +1,24 @@
+{
+  "resources/images/burger-king-icon.png": {
+    "file": "assets/burger-king-icon-b77097bc.png",
+    "src": "resources/images/burger-king-icon.png"
+  },
+  "resources/images/maitresplinter_avatar.png": {
+    "file": "assets/maitresplinter_avatar-20d6376c.png",
+    "src": "resources/images/maitresplinter_avatar.png"
+  },
+  "resources/fonts/Flame-Regular.woff": {
+    "file": "assets/Flame-Regular-cd29b0fc.woff",
+    "src": "resources/fonts/Flame-Regular.woff"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-d095898c.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-96280e5c.js",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}
